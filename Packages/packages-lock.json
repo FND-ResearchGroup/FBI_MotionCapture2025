@@ -1,5 +1,12 @@
 {
   "dependencies": {
+    "com.jg.fullscreengameview": {
+      "version": "https://github.com/JorGra/JG-UnityEditor-GameViewFullscreen.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "a3f3598cb044fd1f2662ec92836a3704f0aeaba3"
+    },
     "com.unity.collab-proxy": {
       "version": "2.6.0",
       "depth": 0,
@@ -100,9 +107,9 @@
       "depth": 0,
       "source": "registry",
       "dependencies": {
+        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.director": "1.0.0",
         "com.unity.modules.animation": "1.0.0",
-        "com.unity.modules.audio": "1.0.0",
         "com.unity.modules.particlesystem": "1.0.0"
       },
       "url": "https://packages.unity.com"

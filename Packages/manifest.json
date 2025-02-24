@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "com.jg.fullscreengameview": "https://github.com/JorGra/JG-UnityEditor-GameViewFullscreen.git",
     "com.unity.collab-proxy": "2.6.0",
     "com.unity.feature.development": "1.0.2",
     "com.unity.multiplayer.center": "1.0.0",
