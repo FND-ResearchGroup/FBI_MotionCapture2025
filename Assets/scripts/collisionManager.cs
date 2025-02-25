@@ -8,6 +8,10 @@ public class collisionManager : MonoBehaviour
         if (other.gameObject.tag == "Finish")
         {
             Debug.Log("Collision");
+        } 
+        else
+        {
+            Debug.Log("Out Limit");
         }
     }
 
