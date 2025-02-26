@@ -29,6 +29,7 @@ public class sceneManager : MonoBehaviour
     private float positionZ = 0;
     private int[] vectorRandomization = new int[84];
     private float[] practiceTrials = {30f,5f,20f,0f,-5f,-20f,5f,20f,-20f,-5f};
+    private bool[] practiceTrialsCylinder = { false, false, false, true, true, true, true, true, false, false };
     private int trialNumber = -1; // first matrix indice is 0
     private bool questionnaireState = false; //0=walking task 1=Questionnaire
     private bool startupState = true;
@@ -80,8 +81,6 @@ public class sceneManager : MonoBehaviour
 
 
 
-
-
             // management of the rotation
             positionZ = hips.transform.position.z;
             if (positionZ<=0.3378 && positionZ>=0) //gestion des 30 premier centimètre avec l'accroissement de la rotation
@@ -97,9 +96,17 @@ public class sceneManager : MonoBehaviour
                 avatar.transform.eulerAngles = new Vector3(0, 0, 0); //initialisation du trial
             }
 
+            //test mouse click
+            if (Input.GetMouseButtonDown(0)) { UnityEngine.Debug.Log("Clic gauche enfoncé !"); }
+            if (Input.GetMouseButtonDown(1)) { UnityEngine.Debug.Log("Clic droit enfoncé !"); }
+            if (Input.GetMouseButtonDown(2)) { UnityEngine.Debug.Log("Clic molette enfoncé !"); }
+
+
 
         } else //questionnaire state
         {
+            
+
 
         }
 
@@ -131,6 +138,7 @@ public class sceneManager : MonoBehaviour
         if (trialNumber < 9) //10 Practice trials
         {
             output = practiceTrials[trialNumber];
+            cylinderSide= practiceTrialsCylinder[trialNumber];
         }
         else
         {
