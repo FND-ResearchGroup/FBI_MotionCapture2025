@@ -5,8 +5,8 @@ using System.IO;
 using System.Text;
 using UnityEngine;
 using UnityEngine.UI;
-using System.Diagnostics;
-using System.Threading;
+//using System.Diagnostics;
+//using System.Threading;
 
 public class sceneManager : MonoBehaviour
 {
@@ -22,18 +22,22 @@ public class sceneManager : MonoBehaviour
     public GameObject CameraTask;
     public GameObject CameraQuestionnaire;
 
+    public int managerState = 0; //0 = initiate Trial; 1 = walking task; 2 = questionnaire; 3 = Save data and wait for the return to position; 4 = feedback training; 5 = end of task 
+    public string response1;
+    public string response2;
+
 
     private GameObject avatar;
     private GameObject hips;
+    private collisionManager collisionManager;
     private float targetDeviation=30;
     private float positionZ = 0;
     private int[] vectorRandomization = new int[84];
-    private float[] practiceTrials = {30f,5f,20f,0f,-5f,-20f,5f,20f,-20f,-5f};
+    private float[] practiceTrials = {0f,5f,20f,0f,-5f,-20f,5f,20f,-20f,-5f};
     private bool[] practiceTrialsCylinder = { false, false, false, true, true, true, true, true, false, false };
     private int trialNumber = -1; // first matrix indice is 0
-    private bool questionnaireState = false; //0=walking task 1=Questionnaire
-    private bool startupState = true;
-
+    private string accuracy;
+   
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -50,42 +54,34 @@ public class sceneManager : MonoBehaviour
             avatar = MaleBody;
         }
         hips = GameObject.Find("B-hips"); //to find the actual position 
+        collisionManager = hips.GetComponent<collisionManager>(); // store collisionManager^script associate with hips
 
         //generate the experimental sucession
         int[] originalValues = {11,11,11,11,11,11,12,12,12,12,12,12,21,21,21,21,21,21,22,22,22,22,22,22,31,31,31,31,31,31,32,32,32,32,32,32,41,41,41,41,41,41,42,42,42,42,42,42,51,51,51,51,51,51,52,52,52,52,52,52,61,61,61,61,61,61,62,62,62,62,62,62,71,71,71,71,71,71,72,72,72,72,72,72};
         int[] randomizedValues = ShuffleArray(originalValues);
         Array.Copy(randomizedValues, vectorRandomization, randomizedValues.Length);
-
-
-
-
     }
 
-        // Update is called once per frame
-        void Update()
+    // Update is called once per frame
+    void Update()
     {
-        if (!questionnaireState) //walking task state
-        { 
-            //management of the condition
-            if (startupState) //initialize the trial
-            {
-                trialNumber++;
-                targetDeviation = conditionSelector();
+        if (managerState == 0) //Initialisation of the trial
+        {
+            trialNumber++;
+            targetDeviation = conditionSelector();
 
-                //
+            CameraTask.SetActive(true);
+            CameraQuestionnaire.SetActive(false);
+            managerState++;
 
-                CameraTask.SetActive(true);
-                CameraQuestionnaire.SetActive(false);
-                startupState = false;
-            }
-
-
-
+        }
+        else if (managerState == 1)
+        {
             // management of the rotation
             positionZ = hips.transform.position.z;
-            if (positionZ<=0.3378 && positionZ>=0) //gestion des 30 premier centimètre avec l'accroissement de la rotation
+            if (positionZ <= 0.3378 && positionZ >= 0) //gestion des 30 premier centimètre avec l'accroissement de la rotation
             {
-                avatar.transform.eulerAngles = new Vector3(0,(positionZ/0.3378f)*targetDeviation,0); //augumentation progressive de la rotation
+                avatar.transform.eulerAngles = new Vector3(0, (positionZ / 0.3378f) * targetDeviation, 0); //augumentation progressive de la rotation
             }
             else if (positionZ > 0.3378)
             {
@@ -96,17 +92,42 @@ public class sceneManager : MonoBehaviour
                 avatar.transform.eulerAngles = new Vector3(0, 0, 0); //initialisation du trial
             }
 
-            //test mouse click
-            if (Input.GetMouseButtonDown(0)) { UnityEngine.Debug.Log("Clic gauche enfoncé !"); }
-            if (Input.GetMouseButtonDown(1)) { UnityEngine.Debug.Log("Clic droit enfoncé !"); }
-            if (Input.GetMouseButtonDown(2)) { UnityEngine.Debug.Log("Clic molette enfoncé !"); }
+            // management of the target hit            
+            if (collisionManager.collisionCylinder)
+            {
+                accuracy = "1";
+                managerState++;
+            }
+            else if (collisionManager.collisionEnd)
+            {
+                accuracy = "0";
+                managerState++;
+            }
 
-
-
-        } else //questionnaire state
+        }
+        else if (managerState == 2) //go to questionnaire
         {
-            
-
+            CameraTask.SetActive(false);
+            CameraQuestionnaire.SetActive(true);
+            managerState++;
+        }
+        else if (managerState == 3) //questionnaire state
+        {
+            //manage by the script questionnaireManager
+        }
+        else if (managerState == 4) //save data
+        {
+            //data saving
+            Debug.Log(accuracy);
+            managerState++;
+        }
+        else if (managerState == 5) //wait participant return to initiale position
+        {
+            //start next trial
+            if (collisionManager.collisionStart)
+            {
+                managerState = 0;
+            }
 
         }
 
