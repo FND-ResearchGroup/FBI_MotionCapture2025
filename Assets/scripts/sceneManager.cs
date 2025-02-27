@@ -22,7 +22,7 @@ public class sceneManager : MonoBehaviour
     public GameObject CameraTask;
     public GameObject CameraQuestionnaire;
 
-    public int managerState = 0; //0 = initiate Trial; 1 = walking task; 2 = questionnaire; 3 = Save data and wait for the return to position; 4 = feedback training; 5 = end of task 
+    public int managerState = 0; //0 = initiate Trial; 1 = walking task; 2 = go to questionnaire; 3 = questionnaire state; 4 = Save data; 5 = wait for the return to position; 
     public string response1;
     public string response2;
 
@@ -73,6 +73,7 @@ public class sceneManager : MonoBehaviour
             CameraTask.SetActive(true);
             CameraQuestionnaire.SetActive(false);
             managerState++;
+            Debug.Log("Trial number: " + trialNumber);
 
         }
         else if (managerState == 1)
@@ -118,7 +119,7 @@ public class sceneManager : MonoBehaviour
         else if (managerState == 4) //save data
         {
             //data saving
-            Debug.Log(accuracy);
+            Debug.Log("Accuracy: " + accuracy);
             managerState++;
         }
         else if (managerState == 5) //wait participant return to initiale position
@@ -156,7 +157,7 @@ public class sceneManager : MonoBehaviour
     {
         float output=0f;
         bool cylinderSide=false;
-        if (trialNumber < 9) //10 Practice trials
+        if (trialNumber < 10) //10 Practice trials
         {
             output = practiceTrials[trialNumber];
             cylinderSide= practiceTrialsCylinder[trialNumber];
