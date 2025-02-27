@@ -225,6 +225,27 @@ public class questionnaireManager : MonoBehaviour
                 sceneManager.managerState = 4;                
             }
         }
+        else if (sceneManager.managerState == 8) //Fin de l'étude
+        {
+            PanelBox1.SetActive(false);
+            PanelBox2.SetActive(false);
+            PanelBox3.SetActive(false);
+            PanelBox4.SetActive(false);
+
+            if (LanguageText == "fr")
+            {
+                questionText.GetComponent<TMPro.TextMeshProUGUI>().text = "Cette expérience est terminée. Merci de votre participation!";
+            }
+            else if (LanguageText == "de")
+            {
+                questionText.GetComponent<TMPro.TextMeshProUGUI>().text = "Dieses Experiment ist abgeschlossen. Vielen Dank für Ihre Teilnahme!";
+            }
+            else
+            {
+                questionText.GetComponent<TMPro.TextMeshProUGUI>().text = "This experiment is over. Thank you for your participation!";
+            }
+        }
+
         
     } 
 }

@@ -16,13 +16,14 @@ public class sceneManager : MonoBehaviour
     public enum gender
     { Female, Male}
     public gender selectGender;
+    public int numberOfTrials;
     public GameObject FemaleBody;
     public GameObject MaleBody;
     public GameObject TargetCylinder;
     public GameObject CameraTask;
     public GameObject CameraQuestionnaire;
 
-    public int managerState = 0; //0 = initiate Trial; 1 = walking task; 2 = go to questionnaire; 3 = questionnaire state; 4 = Save data; 5 = wait for the return to position; 
+    public int managerState = 0; //0 = initiate Trial; 1 = walking task; 2 = go to questionnaire; 3 = questionnaire state; 4 = Save data; 5 = wait for the return to position; 7 = end of study
     public string response1;
     public string response2;
 
@@ -37,6 +38,7 @@ public class sceneManager : MonoBehaviour
     private bool[] practiceTrialsCylinder = { false, false, false, true, true, true, true, true, false, false };
     private int trialNumber = -1; // first matrix indice is 0
     private string accuracy;
+    
    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -57,7 +59,7 @@ public class sceneManager : MonoBehaviour
         collisionManager = hips.GetComponent<collisionManager>(); // store collisionManager^script associate with hips
 
         //generate the experimental sucession
-        int[] originalValues = {11,11,11,11,11,11,12,12,12,12,12,12,21,21,21,21,21,21,22,22,22,22,22,22,31,31,31,31,31,31,32,32,32,32,32,32,41,41,41,41,41,41,42,42,42,42,42,42,51,51,51,51,51,51,52,52,52,52,52,52,61,61,61,61,61,61,62,62,62,62,62,62,71,71,71,71,71,71,72,72,72,72,72,72};
+        int[] originalValues = {11,11,11,11,11,11,12,12,12,12,12,12,21,21,21,21,21,21,22,22,22,22,22,22,31,31,31,31,31,31,32,32,32,32,32,32,41,41,41,41,41,41,42,42,42,42,42,42,51,51,51,51,51,51,52,52,52,52,52,52,61,61,61,61,61,61,62,62,62,62,62,62,71,71,71,71,71,71,72,72,72,72,72,72}; //84 trials (12 for each conditions)
         int[] randomizedValues = ShuffleArray(originalValues);
         Array.Copy(randomizedValues, vectorRandomization, randomizedValues.Length);
     }
@@ -120,10 +122,20 @@ public class sceneManager : MonoBehaviour
         {
             //data saving
             Debug.Log("Accuracy: " + accuracy);
+
+            //check if end of the experiment
+            if (trialNumber - 10 >= numberOfTrials)
+            {
+                managerState = 7;
+            }
+
             managerState++;
         }
         else if (managerState == 5) //wait participant return to initiale position
         {
+     
+           
+
             //start next trial
             if (collisionManager.collisionStart)
             {
@@ -131,6 +143,7 @@ public class sceneManager : MonoBehaviour
             }
 
         }
+       
 
     }
 
