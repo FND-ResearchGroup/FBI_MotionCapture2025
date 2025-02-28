@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using System.Diagnostics;
 
 public class questionnaireManager : MonoBehaviour
 {
@@ -20,7 +21,8 @@ public class questionnaireManager : MonoBehaviour
     private int scrollValue = 0;  // Variable qui sera modifiée par la molette
     private float scrollInput;
 
-    private float timer = 0f;
+    private Stopwatch stopwatch;
+    private long elapsedMilliseconds;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -60,6 +62,7 @@ public class questionnaireManager : MonoBehaviour
                 text2.GetComponent<TMPro.TextMeshProUGUI>().text = " Yes";
                 text3.GetComponent<TMPro.TextMeshProUGUI>().text = " No";
             }
+            stopwatch = new Stopwatch();
 
         }
         else if (questionaireState == 1) //attente réponse pour la première question
@@ -68,23 +71,23 @@ public class questionnaireManager : MonoBehaviour
             {
                 PanelBox2.GetComponent<Image>().color = new Color(0.84f, 0.07f, 0.17f);
                 sceneManager.response1 = "1";
-                timer = 0f;
-                questionaireState++;
+                stopwatch.Start();
+                questionaireState++;               
             }
             else if (Input.GetMouseButtonDown(1)) 
             {
                 PanelBox3.GetComponent<Image>().color = new Color(0.84f, 0.07f, 0.17f);
                 sceneManager.response1 = "0";
-                timer = 0f;
-                questionaireState++;
+                stopwatch.Start();
+                questionaireState++;                
             }
 
         }
         else if (questionaireState == 2) //validation response 1 animation
         {
-            timer += Time.deltaTime; // Faire attendre 0.5s
+            elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-            if (timer >= 0.5f) { questionaireState++; }// Si 0.5s écoulées       
+            if (elapsedMilliseconds >= 500) { questionaireState++; }// Si 500ms se sont écoulées       
         }
         else if (questionaireState == 3) //Initilise the quesionnaire 2
         {
@@ -111,6 +114,8 @@ public class questionnaireManager : MonoBehaviour
             {
                 questionText.GetComponent<TMPro.TextMeshProUGUI>().text = "How sure are you of your response?";
             }
+            stopwatch.Stop();
+            stopwatch = new Stopwatch();
         }
         else if (questionaireState == 4)//attente réponse pour la deuxième question
         {
@@ -191,7 +196,7 @@ public class questionnaireManager : MonoBehaviour
                     sceneManager.response2 = "3";
                 }
 
-                timer = 0f;
+                stopwatch.Start();
                 questionaireState++;
 
             }
@@ -199,9 +204,9 @@ public class questionnaireManager : MonoBehaviour
         }
         else if (questionaireState == 5)//end of questionnaire, repositionner
         {
-            timer += Time.deltaTime; // Faire attendre 0.5s
+            elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-            if (timer >= 0.5f) // Si 0.5s écoulées
+            if (elapsedMilliseconds >= 500) // Faire attendre 500ms
             {
                 PanelBox1.SetActive(false);
                 PanelBox2.SetActive(false);

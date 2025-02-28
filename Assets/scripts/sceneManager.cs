@@ -6,8 +6,7 @@ using System.Text;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
-//using System.Diagnostics;
-//using System.Threading;
+using System.Diagnostics;
 
 public class sceneManager : MonoBehaviour
 {
@@ -47,11 +46,13 @@ public class sceneManager : MonoBehaviour
     private string filenamepath2;
     private string filenamepath3;
 
-    private float timer = 0f;
+    private long timer = 0;
+    private Stopwatch stopwatch;
+    private long elapsedMilliseconds;
     private bool isRecording = false;
     private string[] matrixX; //elle aura une dimention de 304 élément qui est le maximal autorisé (10s). Le trial au dessus devront être supprimé
     private string[] matrixZ;
-    private int matrixIndice = -1;
+    private int matrixIndice = 0;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -104,16 +105,19 @@ public class sceneManager : MonoBehaviour
             CameraTask.SetActive(true);
             CameraQuestionnaire.SetActive(false);
             managerState++;
-            Debug.Log("Trial number: " + trialNumber);
+            UnityEngine.Debug.Log("Trial number: " + trialNumber);
 
             matrixX = new string[304]; //304 is the length max (10s)
             matrixZ = new string[304];
-            matrixIndice = -1;
+            matrixIndice = 0;
+            stopwatch = new Stopwatch();
+            timer = 0;
 
         }
         else if (managerState == 1)
         {
             // management of the rotation
+            positionX = hips.transform.position.x;
             positionZ = hips.transform.position.z;
             if (positionZ <= 0.3378f && positionZ >= 0f) //gestion des 30 premier centimètre avec l'accroissement de la rotation
             {
@@ -123,9 +127,11 @@ public class sceneManager : MonoBehaviour
             {
                 avatar.transform.eulerAngles = new Vector3(0, targetDeviation, 0); //fixé la rotation à la target voulue
                 if (!isRecording)
-                {
-                    timer = 0f; //start of timer for position recording
+                {                    
+                    stopwatch.Start(); //start of timer for position recording
                     isRecording = true;
+                    matrixX[matrixIndice] = positionX.ToString("F3"); //record position of origin
+                    matrixZ[matrixIndice] = positionZ.ToString("F3");
                 }
             }
             else if (positionZ < 0f)
@@ -134,11 +140,11 @@ public class sceneManager : MonoBehaviour
             }
 
             //record X and Z position
-            timer += Time.deltaTime; //add the time in second from the last frame
-            if (isRecording & timer>=0.033f) //save a data point every 33ms (30Hz)
+            elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+            if (isRecording & (elapsedMilliseconds- timer) >= 33) //save a data point every 33ms (30Hz)
             {
                 matrixIndice++;
-                positionX = hips.transform.position.x;
+                timer = elapsedMilliseconds;
                 if (matrixIndice<304)
                 {
                     matrixX[matrixIndice] = positionX.ToString("F3");
@@ -152,17 +158,21 @@ public class sceneManager : MonoBehaviour
             {
                 accuracy = "1";
                 managerState++;
+                UnityEngine.Debug.Log("Accuracy: " + accuracy);
             }
             else if (collisionManager.collisionEnd)
             {
                 accuracy = "0";
                 managerState++;
+                UnityEngine.Debug.Log("Accuracy: " + accuracy);
             }
 
         }
         else if (managerState == 2) //go to questionnaire
         {
             isRecording = false; //stop the recording of position
+            stopwatch.Stop();
+
             CameraTask.SetActive(false);
             CameraQuestionnaire.SetActive(true);
             managerState++;
@@ -182,7 +192,7 @@ public class sceneManager : MonoBehaviour
             }
 
             //check if end of the experiment
-            if (trialNumber - 10 >= numberOfTrials)
+            if (trialNumber - 11 >= numberOfTrials)
             {
                 managerState = 7;
             }

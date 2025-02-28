@@ -396,7 +396,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StreamingClient: {fileID: 821546565}
-  SkeletonAssetName: FNDtest
+  SkeletonAssetName: Skeleton 001
   DestinationAvatar: {fileID: 9000000, guid: b4a78df37623594419bf022884020eeb, type: 3}
 --- !u!1001 &234349440
 PrefabInstance:
@@ -1342,9 +1342,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   participantCode: P999
   selectLangue: 0
-  selectGender: 0
+  selectGender: 1
   numberOfTrials: 84
-  outputFolder: D:\AYBEK_DATA\projet_VR\MotionTracking_FBI\paradigm\data\
+  outputFolder: D:\FNDlab\FBI_MotionCapture2025\data\
   FemaleBody: {fileID: 206086379}
   MaleBody: {fileID: 978556089}
   TargetCylinder: {fileID: 2019797391}
@@ -1463,7 +1463,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   StreamingClient: {fileID: 821546565}
-  SkeletonAssetName: FNDtest
+  SkeletonAssetName: Skeleton 001
   DestinationAvatar: {fileID: 9000000, guid: c7116b6c825c8b845b17d603ecbe3177, type: 3}
 --- !u!1 &1019549298
 GameObject:
@@ -1540,7 +1540,7 @@ Transform:
   m_GameObject: {fileID: 1019549298}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.47, z: 2.347}
+  m_LocalPosition: {x: 0, y: 1.47, z: 2.35}
   m_LocalScale: {x: 9.55, y: 2.9, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -3051,7 +3051,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 1.5, z: -0.5}
-  m_LocalScale: {x: 1, y: 3, z: 1}
+  m_LocalScale: {x: 0.6, y: 3, z: 0.6}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -3282,7 +3282,7 @@ Transform:
   m_GameObject: {fileID: 2019797391}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.3574, y: 0.85, z: 2.027}
+  m_LocalPosition: {x: 0.3574, y: 0.85, z: 2.03}
   m_LocalScale: {x: 0.5, y: 1, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
