@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 //using System.Diagnostics;
@@ -10,6 +11,7 @@ using UnityEngine.UI;
 
 public class sceneManager : MonoBehaviour
 {
+    public string participantCode;
     public enum langue
     { fr, de, en }
     public langue selectLangue;
@@ -17,13 +19,14 @@ public class sceneManager : MonoBehaviour
     { Female, Male}
     public gender selectGender;
     public int numberOfTrials;
+    public string outputFolder;
     public GameObject FemaleBody;
     public GameObject MaleBody;
     public GameObject TargetCylinder;
     public GameObject CameraTask;
     public GameObject CameraQuestionnaire;
 
-    public int managerState = 0; //0 = initiate Trial; 1 = walking task; 2 = go to questionnaire; 3 = questionnaire state; 4 = Save data; 5 = wait for the return to position; 7 = end of study
+    public int managerState = 0; //0 = initiate Trial; 1 = walking task; 2 = go to questionnaire; 3 = questionnaire state; 4 = Save data; 5 = wait for the return to position; 7-8 = end of study
     public string response1;
     public string response2;
 
@@ -32,14 +35,25 @@ public class sceneManager : MonoBehaviour
     private GameObject hips;
     private collisionManager collisionManager;
     private float targetDeviation=30;
+    private float positionX = 0;
     private float positionZ = 0;
     private int[] vectorRandomization = new int[84];
     private float[] practiceTrials = {0f,5f,20f,0f,-5f,-20f,5f,20f,-20f,-5f};
     private bool[] practiceTrialsCylinder = { false, false, false, true, true, true, true, true, false, false };
     private int trialNumber = -1; // first matrix indice is 0
     private string accuracy;
-    
-   
+
+    private string filenamepath1;
+    private string filenamepath2;
+    private string filenamepath3;
+
+    private float timer = 0f;
+    private bool isRecording = false;
+    private string[] matrixX; //elle aura une dimention de 304 élément qui est le maximal autorisé (10s). Le trial au dessus devront être supprimé
+    private string[] matrixZ;
+    private int matrixIndice = -1;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -62,6 +76,21 @@ public class sceneManager : MonoBehaviour
         int[] originalValues = {11,11,11,11,11,11,12,12,12,12,12,12,21,21,21,21,21,21,22,22,22,22,22,22,31,31,31,31,31,31,32,32,32,32,32,32,41,41,41,41,41,41,42,42,42,42,42,42,51,51,51,51,51,51,52,52,52,52,52,52,61,61,61,61,61,61,62,62,62,62,62,62,71,71,71,71,71,71,72,72,72,72,72,72}; //84 trials (12 for each conditions)
         int[] randomizedValues = ShuffleArray(originalValues);
         Array.Copy(randomizedValues, vectorRandomization, randomizedValues.Length);
+
+        //Preparation of the output files
+        DateTime currentDate = DateTime.Now; //get the time
+        string dateString = currentDate.ToString("yyyy-MM-dd"); //convert it into string
+        filenamepath1 = outputFolder + dateString + "_" + participantCode +"_FBA_MotionTrack_QuestionnaireData" +".csv";
+        filenamepath2 = outputFolder + dateString + "_" + participantCode + "_FBA_MotionTrack_PosX" + ".csv";
+        filenamepath3 = outputFolder + dateString + "_" + participantCode + "_FBA_MotionTrack_PosZ" + ".csv";
+
+        //record the header
+        string[] Header1 = new string[] { "Pcode", "Trial", "Condition", "Accuracy", "Question1Response", "Question2Response"};
+        WriteLine(Header1, filenamepath1); //write the first header line of the output file
+        string[] Header2 = new string[] { "Pcode", "Trial", "PositionX every 33ms"};
+        WriteLine(Header2, filenamepath2);
+        string[] Header3 = new string[] { "Pcode", "Trial", "PositionZ every 33ms" };
+        WriteLine(Header3, filenamepath3);
     }
 
     // Update is called once per frame
@@ -77,22 +106,45 @@ public class sceneManager : MonoBehaviour
             managerState++;
             Debug.Log("Trial number: " + trialNumber);
 
+            matrixX = new string[304]; //304 is the length max (10s)
+            matrixZ = new string[304];
+            matrixIndice = -1;
+
         }
         else if (managerState == 1)
         {
             // management of the rotation
             positionZ = hips.transform.position.z;
-            if (positionZ <= 0.3378 && positionZ >= 0) //gestion des 30 premier centimètre avec l'accroissement de la rotation
+            if (positionZ <= 0.3378f && positionZ >= 0f) //gestion des 30 premier centimètre avec l'accroissement de la rotation
             {
                 avatar.transform.eulerAngles = new Vector3(0, (positionZ / 0.3378f) * targetDeviation, 0); //augumentation progressive de la rotation
             }
-            else if (positionZ > 0.3378)
+            else if (positionZ > 0.3378f)
             {
                 avatar.transform.eulerAngles = new Vector3(0, targetDeviation, 0); //fixé la rotation à la target voulue
+                if (!isRecording)
+                {
+                    timer = 0f; //start of timer for position recording
+                    isRecording = true;
+                }
             }
-            else if (positionZ < 0)
+            else if (positionZ < 0f)
             {
                 avatar.transform.eulerAngles = new Vector3(0, 0, 0); //initialisation du trial
+            }
+
+            //record X and Z position
+            timer += Time.deltaTime; //add the time in second from the last frame
+            if (isRecording & timer>=0.033f) //save a data point every 33ms (30Hz)
+            {
+                matrixIndice++;
+                positionX = hips.transform.position.x;
+                if (matrixIndice<304)
+                {
+                    matrixX[matrixIndice] = positionX.ToString("F3");
+                    matrixZ[matrixIndice] = positionZ.ToString("F3");
+                }
+                
             }
 
             // management of the target hit            
@@ -110,6 +162,7 @@ public class sceneManager : MonoBehaviour
         }
         else if (managerState == 2) //go to questionnaire
         {
+            isRecording = false; //stop the recording of position
             CameraTask.SetActive(false);
             CameraQuestionnaire.SetActive(true);
             managerState++;
@@ -121,7 +174,12 @@ public class sceneManager : MonoBehaviour
         else if (managerState == 4) //save data
         {
             //data saving
-            Debug.Log("Accuracy: " + accuracy);
+            if (trialNumber>=10) //save only during the real phase and not the training
+            {
+                SaveDataQuestionnaire();
+                SaveDataPosition(matrixX, filenamepath2); // save the position X
+                SaveDataPosition(matrixZ, filenamepath3); // save the position Z
+            }
 
             //check if end of the experiment
             if (trialNumber - 10 >= numberOfTrials)
@@ -133,9 +191,6 @@ public class sceneManager : MonoBehaviour
         }
         else if (managerState == 5) //wait participant return to initiale position
         {
-     
-           
-
             //start next trial
             if (collisionManager.collisionStart)
             {
@@ -143,8 +198,6 @@ public class sceneManager : MonoBehaviour
             }
 
         }
-       
-
     }
 
 
@@ -204,5 +257,44 @@ public class sceneManager : MonoBehaviour
 
         return output;
 
+    }
+
+    //function to add a line to the csvfile
+    private void WriteLine(string[] values, string filePath)
+    {
+        // Convertir les valeurs en une ligne CSV formatée
+        string line = string.Join(",", values);
+
+        // Ajouter la ligne au fichier
+        using (StreamWriter writer = new StreamWriter(filePath, true, Encoding.UTF8))
+        {
+            writer.WriteLine(line);
+        }
+    }
+
+    private void SaveDataQuestionnaire()
+    {
+        int temp = trialNumber - 9;
+
+        string[] data = new string[]
+        {
+            participantCode,
+            temp.ToString(),
+            vectorRandomization[trialNumber - 10].ToString(),
+            accuracy,
+            response1,
+            response2            
+        };
+
+        WriteLine(data, filenamepath1);
+    }
+
+    private void SaveDataPosition(string[] positions, string filePath)
+    {
+        int temp = trialNumber - 9;
+
+        string[] data = new string[] { participantCode, temp.ToString()}.Concat(positions).ToArray(); //pour concatenate le vecteur de position
+        
+        WriteLine(data, filePath);
     }
 }
