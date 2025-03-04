@@ -31,25 +31,25 @@ public class sceneManagerEXP2 : MonoBehaviour
     public string response2;
 
 
-    private Vector3[,] hips = new Vector3[320, 2]; //dans la colonne 1 ce sera les translation et en colonne 2 les rotations
-    private Vector3[,] spine = new Vector3[320, 2];
-    private Vector3[,] chest = new Vector3[320, 2];
-    private Vector3[,] neck = new Vector3[320, 2];
-    private Vector3[,] head = new Vector3[320, 2];
-    private Vector3[,] shoulderL = new Vector3[320, 2];
-    private Vector3[,] upperarmL = new Vector3[320, 2];
-    private Vector3[,] forerarmL = new Vector3[320, 2];
-    private Vector3[,] handL = new Vector3[320, 2];
-    private Vector3[,] shoulderR = new Vector3[320, 2];
-    private Vector3[,] upperarmR = new Vector3[320, 2];
-    private Vector3[,] forerarmR = new Vector3[320, 2];
-    private Vector3[,] handR = new Vector3[320, 2];
-    private Vector3[,] thighL = new Vector3[320, 2];
-    private Vector3[,] shinL = new Vector3[320, 2];
-    private Vector3[,] footL = new Vector3[320, 2];
-    private Vector3[,] thighR = new Vector3[320, 2];
-    private Vector3[,] shinR = new Vector3[320, 2];
-    private Vector3[,] footR = new Vector3[320, 2];
+    private Vector3[,] hips = new Vector3[1000, 2]; //dans la colonne 1 ce sera les translation et en colonne 2 les rotations
+    private Vector3[,] spine = new Vector3[1000, 2];
+    private Vector3[,] chest = new Vector3[1000, 2];
+    private Vector3[,] neck = new Vector3[1000, 2];
+    private Vector3[,] head = new Vector3[1000, 2];
+    private Vector3[,] shoulderL = new Vector3[1000, 2];
+    private Vector3[,] upperarmL = new Vector3[1000, 2];
+    private Vector3[,] forerarmL = new Vector3[1000, 2];
+    private Vector3[,] handL = new Vector3[1000, 2];
+    private Vector3[,] shoulderR = new Vector3[1000, 2];
+    private Vector3[,] upperarmR = new Vector3[1000, 2];
+    private Vector3[,] forerarmR = new Vector3[1000, 2];
+    private Vector3[,] handR = new Vector3[1000, 2];
+    private Vector3[,] thighL = new Vector3[1000, 2];
+    private Vector3[,] shinL = new Vector3[1000, 2];
+    private Vector3[,] footL = new Vector3[1000, 2];
+    private Vector3[,] thighR = new Vector3[1000, 2];
+    private Vector3[,] shinR = new Vector3[1000, 2];
+    private Vector3[,] footR = new Vector3[1000, 2];
 
     private GameObject Bhips;
     private GameObject Bspine;
@@ -114,6 +114,7 @@ public class sceneManagerEXP2 : MonoBehaviour
     private string[] matrixZ;
     private int matrixIndice = 0;
 
+    private float lastFixedUpdateTime = 0f;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -141,7 +142,7 @@ public class sceneManagerEXP2 : MonoBehaviour
         Bhead = GameObject.Find("B-head");
         BshoulderL = GameObject.Find("B-shoulder.L");
         BupperarmL = GameObject.Find("B-upperArm.L");
-        BforerarmL = GameObject.Find("B-forerarm.L");
+        BforerarmL = GameObject.Find("B-forearm.L");
         BhandL = GameObject.Find("B-hand.L");
         BshoulderR = GameObject.Find("B-shoulder.R");
         BupperarmR = GameObject.Find("B-upperArm.R");
@@ -161,7 +162,7 @@ public class sceneManagerEXP2 : MonoBehaviour
         Bhead2 = GameObject.Find("B-head2");
         BshoulderL2 = GameObject.Find("B-shoulder.L2");
         BupperarmL2 = GameObject.Find("B-upperArm.L2");
-        BforerarmL2 = GameObject.Find("B-forerarm.L2");
+        BforerarmL2 = GameObject.Find("B-forearm.L2");
         BhandL2 = GameObject.Find("B-hand.L2");
         BshoulderR2 = GameObject.Find("B-shoulder.R2");
         BupperarmR2 = GameObject.Find("B-upperArm.R2");
@@ -194,10 +195,12 @@ public class sceneManagerEXP2 : MonoBehaviour
         //WriteLine(Header2, filenamepath2);
         //string[] Header3 = new string[] { "Pcode", "Trial", "PositionZ every 33ms" };
         //WriteLine(Header3, filenamepath3);
+
+        Time.fixedDeltaTime = 0.005f; //fix update toutes les 5ms
     }
 
     // Update is called once per frame
-    void Update()
+    void FixedUpdate()
     {
         if (managerState == 0) //Initialisation of the trial
         {
@@ -220,6 +223,7 @@ public class sceneManagerEXP2 : MonoBehaviour
         {
             //save current position
             recordIndice++;
+            //UnityEngine.Debug.Log("recordIndice: " + recordIndice);
             hips[recordIndice, 0] = Bhips.transform.localPosition; hips[recordIndice, 1] = Bhips.transform.localRotation.eulerAngles;
             spine[recordIndice, 0] = Bspine.transform.localPosition; spine[recordIndice, 1] = Bspine.transform.localRotation.eulerAngles;
             chest[recordIndice, 0] = Bchest.transform.localPosition; chest[recordIndice, 1] = Bchest.transform.localRotation.eulerAngles;
@@ -272,6 +276,12 @@ public class sceneManagerEXP2 : MonoBehaviour
 
 
             //}
+            float currentTime = Time.realtimeSinceStartup; // Temps écoulé depuis le lancement du jeu
+            float deltaTimeMs = (currentTime - lastFixedUpdateTime) * 1000f; // Convertir en ms
+
+            UnityEngine.Debug.Log("Temps écoulé depuis le dernier FixedUpdate : " + deltaTimeMs + " ms");
+
+            lastFixedUpdateTime = currentTime;
 
 
 
