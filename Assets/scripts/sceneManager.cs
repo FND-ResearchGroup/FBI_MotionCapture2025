@@ -127,7 +127,7 @@ public class sceneManager : MonoBehaviour
             {
                 avatar.transform.eulerAngles = new Vector3(0, targetDeviation, 0); //fixé la rotation à la target voulue
                 if (!isRecording)
-                {                    
+                {
                     stopwatch.Start(); //start of timer for position recording
                     isRecording = true;
                     matrixX[matrixIndice] = positionX.ToString("F3"); //record position of origin
@@ -141,16 +141,16 @@ public class sceneManager : MonoBehaviour
 
             //record X and Z position
             elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
-            if (isRecording & (elapsedMilliseconds- timer) >= 33) //save a data point every 33ms (30Hz)
+            if (isRecording & (elapsedMilliseconds - timer) >= 33) //save a data point every 33ms (30Hz)
             {
                 matrixIndice++;
                 timer = elapsedMilliseconds;
-                if (matrixIndice<304)
+                if (matrixIndice < 304)
                 {
                     matrixX[matrixIndice] = positionX.ToString("F3");
                     matrixZ[matrixIndice] = positionZ.ToString("F3");
                 }
-                
+
             }
 
             // management of the target hit            
@@ -184,7 +184,7 @@ public class sceneManager : MonoBehaviour
         else if (managerState == 4) //save data
         {
             //data saving
-            if (trialNumber>=10) //save only during the real phase and not the training
+            if (trialNumber >= 10) //save only during the real phase and not the training
             {
                 SaveDataQuestionnaire();
                 SaveDataPosition(matrixX, filenamepath2); // save the position X
@@ -192,7 +192,7 @@ public class sceneManager : MonoBehaviour
             }
 
             //check if end of the experiment
-            if (trialNumber - 12 >= numberOfTrials)
+            if (trialNumber - 10 >= numberOfTrials - 1)
             {
                 managerState = 7;
             }
@@ -208,6 +208,8 @@ public class sceneManager : MonoBehaviour
             }
 
         }
+        else if (managerState == 8)
+        { }//end of the study
     }
 
 
