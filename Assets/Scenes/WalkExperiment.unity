@@ -1340,9 +1340,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edaf7416ff55ecb449e5f31304869610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  participantCode: P999
+  participantCode: P000
   selectLangue: 0
-  selectGender: 1
+  selectGender: 0
   numberOfTrials: 84
   outputFolder: D:\FNDlab\FBI_MotionCapture2025\data\
   FemaleBody: {fileID: 206086379}

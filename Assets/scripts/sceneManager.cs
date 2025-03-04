@@ -192,7 +192,7 @@ public class sceneManager : MonoBehaviour
             }
 
             //check if end of the experiment
-            if (trialNumber - 11 >= numberOfTrials)
+            if (trialNumber - 12 >= numberOfTrials)
             {
                 managerState = 7;
             }
