@@ -15,41 +15,42 @@ public class sceneManagerEXP2 : MonoBehaviour
     { fr, de, en }
     public langue selectLangue;
     public enum gender
-    { Female, Male}
+    { Female, Male }
     public gender selectGender;
     public int numberOfTrials;
     public string outputFolder;
     public GameObject AvatarF;
     public GameObject AvatarM;
     public GameObject FemaleBody;
-    public GameObject MaleBody;    
+    public GameObject MaleBody;
     public GameObject CameraTask;
     public GameObject CameraQuestionnaire;
+    public GameObject CanavasCross;
 
-    public int managerState = 1; //0 = initiate Trial; 1 = walking task; 2 = go to questionnaire; 3 = questionnaire state; 4 = Save data; 5 = wait for the return to position; 7-8 = end of study
+    public int managerState = 0; //0 = initiate Trial; 1 = wait for participant start; 2 = Red cross of 2s (and start of body recording depend on the delay); 3 = Playback of body for 3s; 4 = questionnaire state; 5 = Save data; 7 = end of study
     public string response1;
     public string response2;
 
-
-    private Vector3[,] hips = new Vector3[1000, 2]; //dans la colonne 1 ce sera les translation et en colonne 2 les rotations
-    private Vector3[,] spine = new Vector3[1000, 2];
-    private Vector3[,] chest = new Vector3[1000, 2];
-    private Vector3[,] neck = new Vector3[1000, 2];
-    private Vector3[,] head = new Vector3[1000, 2];
-    private Vector3[,] shoulderL = new Vector3[1000, 2];
-    private Vector3[,] upperarmL = new Vector3[1000, 2];
-    private Vector3[,] forerarmL = new Vector3[1000, 2];
-    private Vector3[,] handL = new Vector3[1000, 2];
-    private Vector3[,] shoulderR = new Vector3[1000, 2];
-    private Vector3[,] upperarmR = new Vector3[1000, 2];
-    private Vector3[,] forerarmR = new Vector3[1000, 2];
-    private Vector3[,] handR = new Vector3[1000, 2];
-    private Vector3[,] thighL = new Vector3[1000, 2];
-    private Vector3[,] shinL = new Vector3[1000, 2];
-    private Vector3[,] footL = new Vector3[1000, 2];
-    private Vector3[,] thighR = new Vector3[1000, 2];
-    private Vector3[,] shinR = new Vector3[1000, 2];
-    private Vector3[,] footR = new Vector3[1000, 2];
+    private int nbTF = 1000; //determine le nombre de point temporelle qui seront sauvegarder
+    private Vector3[,] hips;
+    private Vector3[,] spine;
+    private Vector3[,] chest;
+    private Vector3[,] neck;
+    private Vector3[,] head;
+    private Vector3[,] shoulderL;
+    private Vector3[,] upperarmL;
+    private Vector3[,] forerarmL;
+    private Vector3[,] handL;
+    private Vector3[,] shoulderR;
+    private Vector3[,] upperarmR;
+    private Vector3[,] forerarmR;
+    private Vector3[,] handR;
+    private Vector3[,] thighL;
+    private Vector3[,] shinL;
+    private Vector3[,] footL;
+    private Vector3[,] thighR;
+    private Vector3[,] shinR;
+    private Vector3[,] footR;
 
     private GameObject Bhips;
     private GameObject Bspine;
@@ -90,17 +91,14 @@ public class sceneManagerEXP2 : MonoBehaviour
     private GameObject BthighR2;
     private GameObject BshinR2;
     private GameObject BfootR2;
+    private GameObject Avatar;
 
 
-    private float targetDeviation=30;
-    //private float positionX = 0;
-    //private float positionZ = 0;
+
     private int[] vectorRandomization = new int[144];
-    private float[] practiceTrials = {0f,5f,20f,0f,-5f,-20f,5f,20f,-20f,-5f};
     private int trialNumber = -1; // first matrix indice is 0
     private int recordIndice = -1; //indice save position
     private int playIndice = -1; //indice play position
-    private string accuracy;
 
     private string filenamepath1;
     private string filenamepath2;
@@ -109,8 +107,8 @@ public class sceneManagerEXP2 : MonoBehaviour
     private long timer = 0;
     private Stopwatch stopwatch;
     private long elapsedMilliseconds;
-    private bool isRecording = false;
-    private string[] matrixX; //elle aura une dimention de 304 élément qui est le maximal autorisé (10s). Le trial au dessus devront être supprimé
+    private long currentDelay;
+    private string[] matrixX;
     private string[] matrixZ;
     private int matrixIndice = 0;
 
@@ -119,19 +117,21 @@ public class sceneManagerEXP2 : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-       if (selectGender.ToString()=="Female")
+        if (selectGender.ToString() == "Female")
         {
             FemaleBody.SetActive(true);
             MaleBody.SetActive(false);
             AvatarF.SetActive(true);
             AvatarM.SetActive(false);
+            Avatar = AvatarF;
         }
-       else
+        else
         {
             FemaleBody.SetActive(false);
             MaleBody.SetActive(true);
             AvatarF.SetActive(false);
             AvatarM.SetActive(true);
+            Avatar = AvatarM;
         }
 
         //assign the GameObjects
@@ -176,17 +176,17 @@ public class sceneManagerEXP2 : MonoBehaviour
         BfootR2 = GameObject.Find("B-foot.R2");
 
 
-        ////generate the experimental sucession
-        //int[] originalValues = { 11, 11, 11, 11, 11, 11, 12, 12, 12, 12, 12, 12, 21, 21, 21, 21, 21, 21, 22, 22, 22, 22, 22, 22, 31, 31, 31, 31, 31, 31, 32, 32, 32, 32, 32, 32, 41, 41, 41, 41, 41, 41, 42, 42, 42, 42, 42, 42, 51, 51, 51, 51, 51, 51, 52, 52, 52, 52, 52, 52, 61, 61, 61, 61, 61, 61, 62, 62, 62, 62, 62, 62, 71, 71, 71, 71, 71, 71, 72, 72, 72, 72, 72, 72 }; //84 trials (12 for each conditions)
-        //int[] randomizedValues = ShuffleArray(originalValues);
-        //Array.Copy(randomizedValues, vectorRandomization, randomizedValues.Length);
+        //generate the experimental sucession
+        int[] originalValues = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25, 50, 75, 100, 150, 225, 300, 450, 600, 750, 900, 1050, 1125, 1200, 1275, 1350, 25, 50, 75, 100, 150, 225, 300, 450, 600, 750, 900, 1050, 1125, 1200, 1275, 1350, 25, 50, 75, 100, 150, 225, 300, 450, 600, 750, 900, 1050, 1125, 1200, 1275, 1350, 25, 50, 75, 100, 150, 225, 300, 450, 600, 750, 900, 1050, 1125, 1200, 1275, 1350, 25, 50, 75, 100, 150, 225, 300, 450, 600, 750, 900, 1050, 1125, 1200, 1275, 1350, 25, 50, 75, 100, 150, 225, 300, 450, 600, 750, 900, 1050, 1125, 1200, 1275, 1350, 25, 50, 75, 100, 150, 225, 300, 450, 600, 750, 900, 1050, 1125, 1200, 1275, 1350, 25, 50, 75, 100, 150, 225, 300, 450, 600, 750, 900, 1050, 1125, 1200, 1275, 1350 }; //144 trials (8 for each of the 16 conditions + 16 no delay)
+        int[] randomizedValues = ShuffleArray(originalValues);
+        Array.Copy(randomizedValues, vectorRandomization, randomizedValues.Length);
 
-        ////Preparation of the output files
-        //DateTime currentDate = DateTime.Now; //get the time
-        //string dateString = currentDate.ToString("yyyy-MM-dd"); //convert it into string
-        //filenamepath1 = outputFolder + dateString + "_" + participantCode + "_FBA_MotionTrack_QuestionnaireData" + ".csv";
-        //filenamepath2 = outputFolder + dateString + "_" + participantCode + "_FBA_MotionTrack_PosX" + ".csv";
-        //filenamepath3 = outputFolder + dateString + "_" + participantCode + "_FBA_MotionTrack_PosZ" + ".csv";
+        //Preparation of the output files
+        DateTime currentDate = DateTime.Now; //get the time
+        string dateString = currentDate.ToString("yyyy-MM-dd"); //convert it into string
+        filenamepath1 = outputFolder + dateString + "_" + participantCode + "_FBA_Task2_QuestionnaireData" + ".csv";
+        filenamepath2 = outputFolder + dateString + "_" + participantCode + "_FBA_Task2_PosX" + ".csv";
+        filenamepath3 = outputFolder + dateString + "_" + participantCode + "_FBA_Task2_PosZ" + ".csv";
 
         ////record the header
         //string[] Header1 = new string[] { "Pcode", "Trial", "Condition", "Accuracy", "Question1Response", "Question2Response" };
@@ -202,80 +202,90 @@ public class sceneManagerEXP2 : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        if (managerState == 0) //Initialisation of the trial
+        if (managerState == 0) //Initialisation du trial
         {
             trialNumber++;
-            targetDeviation = conditionSelector();
+            currentDelay = (long)vectorRandomization[trialNumber];
+            UnityEngine.Debug.Log("Trial number: " + trialNumber + "Delay: " + currentDelay);
 
+            Avatar.SetActive(false);
+            CanavasCross.SetActive(false);
             CameraTask.SetActive(true);
-            CameraQuestionnaire.SetActive(false);
-            managerState++;
-            UnityEngine.Debug.Log("Trial number: " + trialNumber);
+            CameraQuestionnaire.SetActive(false);            
 
-            matrixX = new string[304]; //304 is the length max (10s)
-            matrixZ = new string[304];
-            matrixIndice = 0;
-            stopwatch = new Stopwatch();
+            //empty the body recording
+            hips = new Vector3[nbTF, 2]; //dans la colonne 1 ce sera les translation et en colonne 2 les rotations
+            spine = new Vector3[nbTF, 2];
+            chest = new Vector3[nbTF, 2];
+            neck = new Vector3[nbTF, 2];
+            head = new Vector3[nbTF, 2];
+            shoulderL = new Vector3[nbTF, 2];
+            upperarmL = new Vector3[nbTF, 2];
+            forerarmL = new Vector3[nbTF, 2];
+            handL = new Vector3[nbTF, 2];
+            shoulderR = new Vector3[nbTF, 2];
+            upperarmR = new Vector3[nbTF, 2];
+            forerarmR = new Vector3[nbTF, 2];
+            handR = new Vector3[nbTF, 2];
+            thighL = new Vector3[nbTF, 2];
+            shinL = new Vector3[nbTF, 2];
+            footL = new Vector3[nbTF, 2];
+            thighR = new Vector3[nbTF, 2];
+            shinR = new Vector3[nbTF, 2];
+            footR = new Vector3[nbTF, 2];
+
+            recordIndice = -1;
+            playIndice = -1;
+
             timer = 0;
-
+            matrixIndice = 0;
+            managerState++;
         }
-        else if (managerState == 1)
+        else if (managerState == 1) //en attente du participant start
         {
-            //save current position
-            recordIndice++;
-            //UnityEngine.Debug.Log("recordIndice: " + recordIndice);
-            hips[recordIndice, 0] = Bhips.transform.localPosition; hips[recordIndice, 1] = Bhips.transform.localRotation.eulerAngles;
-            spine[recordIndice, 0] = Bspine.transform.localPosition; spine[recordIndice, 1] = Bspine.transform.localRotation.eulerAngles;
-            chest[recordIndice, 0] = Bchest.transform.localPosition; chest[recordIndice, 1] = Bchest.transform.localRotation.eulerAngles;
-            neck[recordIndice, 0] = Bneck.transform.localPosition; neck[recordIndice, 1] = Bneck.transform.localRotation.eulerAngles;
-            head[recordIndice, 0] = Bhead.transform.localPosition; head[recordIndice, 1] = Bhead.transform.localRotation.eulerAngles;
-            shoulderL[recordIndice, 0] = BshoulderL.transform.localPosition; shoulderL[recordIndice, 1] = BshoulderL.transform.localRotation.eulerAngles;
-            upperarmL[recordIndice, 0] = BupperarmL.transform.localPosition; upperarmL[recordIndice, 1] = BupperarmL.transform.localRotation.eulerAngles;
-            forerarmL[recordIndice, 0] = BforerarmL.transform.localPosition; forerarmL[recordIndice, 1] = BforerarmL.transform.localRotation.eulerAngles;
-            handL[recordIndice, 0] = BhandL.transform.localPosition; handL[recordIndice, 1] = BhandL.transform.localRotation.eulerAngles;
-            shoulderR[recordIndice, 0] = BshoulderR.transform.localPosition; shoulderR[recordIndice, 1] = BshoulderR.transform.localRotation.eulerAngles;
-            upperarmR[recordIndice, 0] = BupperarmR.transform.localPosition; upperarmR[recordIndice, 1] = BupperarmR.transform.localRotation.eulerAngles;
-            forerarmR[recordIndice, 0] = BforerarmR.transform.localPosition; forerarmR[recordIndice, 1] = BforerarmR.transform.localRotation.eulerAngles;
-            handR[recordIndice, 0] = BhandR.transform.localPosition; handR[recordIndice, 1] = BhandR.transform.localRotation.eulerAngles;
-            thighL[recordIndice, 0] = BthighL.transform.localPosition; thighL[recordIndice, 1] = BthighL.transform.localRotation.eulerAngles;
-            shinL[recordIndice, 0] = BshinL.transform.localPosition; shinL[recordIndice, 1] = BshinL.transform.localRotation.eulerAngles;
-            footL[recordIndice, 0] = BfootL.transform.localPosition; footL[recordIndice, 1] = BfootL.transform.localRotation.eulerAngles;
-            thighR[recordIndice, 0] = BthighR.transform.localPosition; thighR[recordIndice, 1] = BthighR.transform.localRotation.eulerAngles;
-            shinR[recordIndice, 0] = BshinR.transform.localPosition; shinR[recordIndice, 1] = BshinR.transform.localRotation.eulerAngles;
-            footR[recordIndice, 0] = BfootR.transform.localPosition; footR[recordIndice, 1] = BfootR.transform.localRotation.eulerAngles;
+            if (Input.GetMouseButtonDown(0) | Input.GetMouseButtonDown(1)) //clique droite ou gauche de la souris
+            {
+                managerState++;
+                CanavasCross.SetActive(true); //trun on the cross
+                stopwatch = new Stopwatch();
+            }
+        }
+        else if (managerState == 2) //pre-stim of 2s
+        {
+            elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
-            //playback
-            playIndice++;
-            Bhips2.transform.localPosition = hips[playIndice, 0]; Bhips2.transform.localRotation = Quaternion.Euler(hips[playIndice, 1]);
-            Bspine2.transform.localPosition = spine[playIndice, 0]; Bspine2.transform.localRotation = Quaternion.Euler(spine[playIndice, 1]);
-            Bchest2.transform.localPosition = chest[playIndice, 0]; Bchest2.transform.localRotation = Quaternion.Euler(chest[playIndice, 1]);
-            Bneck2.transform.localPosition = neck[playIndice, 0]; Bneck2.transform.localRotation = Quaternion.Euler(neck[playIndice, 1]);
-            Bhead2.transform.localPosition = head[playIndice, 0]; Bhead2.transform.localRotation = Quaternion.Euler(head[playIndice, 1]);
-            BshoulderL2.transform.localPosition = shoulderL[playIndice, 0]; BshoulderL2.transform.localRotation = Quaternion.Euler(shoulderL[playIndice, 1]);
-            BupperarmL2.transform.localPosition = upperarmL[playIndice, 0]; BupperarmL2.transform.localRotation = Quaternion.Euler(upperarmL[playIndice, 1]);
-            BforerarmL2.transform.localPosition = forerarmL[playIndice, 0]; BforerarmL2.transform.localRotation = Quaternion.Euler(forerarmL[playIndice, 1]);
-            BhandL2.transform.localPosition = handL[playIndice, 0]; BhandL2.transform.localRotation = Quaternion.Euler(handL[playIndice, 1]);
-            BshoulderR2.transform.localPosition = shoulderR[playIndice, 0]; BshoulderR2.transform.localRotation = Quaternion.Euler(shoulderR[playIndice, 1]);
-            BupperarmR2.transform.localPosition = upperarmR[playIndice, 0]; BupperarmR2.transform.localRotation = Quaternion.Euler(upperarmR[playIndice, 1]);
-            BforerarmR2.transform.localPosition = forerarmR[playIndice, 0]; BforerarmR2.transform.localRotation = Quaternion.Euler(forerarmR[playIndice, 1]);
-            BhandR2.transform.localPosition = handR[playIndice, 0]; BhandR2.transform.localRotation = Quaternion.Euler(handR[playIndice, 1]);
-            BthighL2.transform.localPosition = thighL[playIndice, 0]; BthighL2.transform.localRotation = Quaternion.Euler(thighL[playIndice, 1]);
-            BshinL2.transform.localPosition = shinL[playIndice, 0]; BshinL2.transform.localRotation = Quaternion.Euler(shinL[playIndice, 1]);
-            BfootL2.transform.localPosition = footL[playIndice, 0]; BfootL2.transform.localRotation = Quaternion.Euler(footL[playIndice, 1]);
-            BthighR2.transform.localPosition = thighR[playIndice, 0]; BthighR2.transform.localRotation = Quaternion.Euler(thighR[playIndice, 1]);
-            BshinR2.transform.localPosition = shinR[playIndice, 0]; BshinR2.transform.localRotation = Quaternion.Euler(shinR[playIndice, 1]);
-            BfootR2.transform.localPosition = footR[playIndice, 0]; BfootR2.transform.localRotation = Quaternion.Euler(footR[playIndice, 1]);
+            if (elapsedMilliseconds >= 2000 - currentDelay) //start of the recording
+            {
+                bodyPositionRecording();
+            }
+            
+            if (elapsedMilliseconds >= 2000)
+            {
+                Avatar.SetActive(true); //show the avatar
+                timer = elapsedMilliseconds; //record the precise time of playback start
+                managerState++;
+            }
+        }
+        else if (managerState == 3) //start the playback of the mouvement
+        {
+            elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+            if (elapsedMilliseconds- timer <= 3000) //durée de 3s du playback
+            {
+                bodyPositionRecording(); //continue a sauvé de mouvement
+                bodyPositionPlayback(); // playback du recording 
 
+                //save legs position
+                //NEED TO BE PROGRAMED
+            }
+            else
+            {
+                CameraTask.SetActive(false);
+                CameraQuestionnaire.SetActive(true);                
+                stopwatch.Stop();
+                managerState++;
+            }
 
-            ////record X and Z position
-            //elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
-            //if (isRecording & (elapsedMilliseconds- timer) >= 33) //save a data point every 33ms (30Hz)
-            //{
-            //    matrixIndice++;
-            //    timer = elapsedMilliseconds;
-
-
-            //}
+            // timing test NEED TO BE REMOVED
             float currentTime = Time.realtimeSinceStartup; // Temps écoulé depuis le lancement du jeu
             float deltaTimeMs = (currentTime - lastFixedUpdateTime) * 1000f; // Convertir en ms
 
@@ -283,45 +293,32 @@ public class sceneManagerEXP2 : MonoBehaviour
 
             lastFixedUpdateTime = currentTime;
 
-
-
         }
-        else if (managerState == 2) //go to questionnaire
+        else if (managerState == 4) //questionnaire state
         {
-            isRecording = false; //stop the recording of position
-            stopwatch.Stop();
-
-            CameraTask.SetActive(false);
-            CameraQuestionnaire.SetActive(true);
-            managerState++;
+            //manage by the script questionnaireManagerEXP2
         }
-        else if (managerState == 3) //questionnaire state
-        {
-            //manage by the script questionnaireManager
-        }
-        else if (managerState == 4) //save data
+        else if (managerState == 5) //save data
         {
             //data saving
-            if (trialNumber>=10) //save only during the real phase and not the training
-            {
-                SaveDataQuestionnaire();
-                SaveDataPosition(matrixX, filenamepath2); // save the position X
-                SaveDataPosition(matrixZ, filenamepath3); // save the position Z
-            }
+            SaveDataQuestionnaire();
+            SaveDataPosition(matrixX, filenamepath2); // save the position X
+            SaveDataPosition(matrixZ, filenamepath3); // save the position Z
+
 
             //check if end of the experiment
-            if (trialNumber - 11 >= numberOfTrials)
+            if (trialNumber >= numberOfTrials-1)
             {
-                managerState = 7;
+                managerState = 7; //terminate the study
             }
-
-            managerState++;
+            else
+            {
+                managerState=0; //go to next trial
+            }
+                        
         }
-        else if (managerState == 5) //wait participant return to initiale position
-        {
-            
-
-        }
+        else if (managerState == 7) //end of the study
+        { }
     }
 
 
@@ -343,36 +340,62 @@ public class sceneManagerEXP2 : MonoBehaviour
         return list.ToArray();
     }
 
-    private float conditionSelector()
+    private void bodyPositionRecording()
     {
-        float output=0f;
-        bool cylinderSide=false;
-        if (trialNumber < 10) //10 Practice trials
+        if (recordIndice<nbTF)
         {
-            output = practiceTrials[trialNumber];
+             //save current position
+             recordIndice++;
+             hips[recordIndice, 0] = Bhips.transform.localPosition; hips[recordIndice, 1] = Bhips.transform.localRotation.eulerAngles;
+             spine[recordIndice, 0] = Bspine.transform.localPosition; spine[recordIndice, 1] = Bspine.transform.localRotation.eulerAngles;
+             chest[recordIndice, 0] = Bchest.transform.localPosition; chest[recordIndice, 1] = Bchest.transform.localRotation.eulerAngles;
+             neck[recordIndice, 0] = Bneck.transform.localPosition; neck[recordIndice, 1] = Bneck.transform.localRotation.eulerAngles;
+             head[recordIndice, 0] = Bhead.transform.localPosition; head[recordIndice, 1] = Bhead.transform.localRotation.eulerAngles;
+             shoulderL[recordIndice, 0] = BshoulderL.transform.localPosition; shoulderL[recordIndice, 1] = BshoulderL.transform.localRotation.eulerAngles;
+             upperarmL[recordIndice, 0] = BupperarmL.transform.localPosition; upperarmL[recordIndice, 1] = BupperarmL.transform.localRotation.eulerAngles;
+             forerarmL[recordIndice, 0] = BforerarmL.transform.localPosition; forerarmL[recordIndice, 1] = BforerarmL.transform.localRotation.eulerAngles;
+             handL[recordIndice, 0] = BhandL.transform.localPosition; handL[recordIndice, 1] = BhandL.transform.localRotation.eulerAngles;
+             shoulderR[recordIndice, 0] = BshoulderR.transform.localPosition; shoulderR[recordIndice, 1] = BshoulderR.transform.localRotation.eulerAngles;
+             upperarmR[recordIndice, 0] = BupperarmR.transform.localPosition; upperarmR[recordIndice, 1] = BupperarmR.transform.localRotation.eulerAngles;
+             forerarmR[recordIndice, 0] = BforerarmR.transform.localPosition; forerarmR[recordIndice, 1] = BforerarmR.transform.localRotation.eulerAngles;
+             handR[recordIndice, 0] = BhandR.transform.localPosition; handR[recordIndice, 1] = BhandR.transform.localRotation.eulerAngles;
+             thighL[recordIndice, 0] = BthighL.transform.localPosition; thighL[recordIndice, 1] = BthighL.transform.localRotation.eulerAngles;
+             shinL[recordIndice, 0] = BshinL.transform.localPosition; shinL[recordIndice, 1] = BshinL.transform.localRotation.eulerAngles;
+             footL[recordIndice, 0] = BfootL.transform.localPosition; footL[recordIndice, 1] = BfootL.transform.localRotation.eulerAngles;
+             thighR[recordIndice, 0] = BthighR.transform.localPosition; thighR[recordIndice, 1] = BthighR.transform.localRotation.eulerAngles;
+             shinR[recordIndice, 0] = BshinR.transform.localPosition; shinR[recordIndice, 1] = BshinR.transform.localRotation.eulerAngles;
+             footR[recordIndice, 0] = BfootR.transform.localPosition; footR[recordIndice, 1] = BfootR.transform.localRotation.eulerAngles;
         }
-        else
-        {
-            if (vectorRandomization[trialNumber-10] == 11) {output = 0f; cylinderSide=false;}
-            else if (vectorRandomization[trialNumber - 10] == 12) {output = 0f; cylinderSide = true;}
-            else if (vectorRandomization[trialNumber - 10] == 21) {output = 7.5f; cylinderSide = false;}
-            else if (vectorRandomization[trialNumber - 10] == 22) {output = 7.5f; cylinderSide = true;}
-            else if (vectorRandomization[trialNumber - 10] == 31) {output = -7.5f; cylinderSide = false;}
-            else if (vectorRandomization[trialNumber - 10] == 32) {output = -7.5f; cylinderSide = true;}
-            else if (vectorRandomization[trialNumber - 10] == 41) {output = 15f; cylinderSide = false;}
-            else if (vectorRandomization[trialNumber - 10] == 42) {output = 15f; cylinderSide = true;}
-            else if (vectorRandomization[trialNumber - 10] == 51) {output = -15f; cylinderSide = false;}
-            else if (vectorRandomization[trialNumber - 10] == 52) {output = -15f; cylinderSide = true;}
-            else if (vectorRandomization[trialNumber - 10] == 61) {output = 30f; cylinderSide = false;}
-            else if (vectorRandomization[trialNumber - 10] == 62) {output = 30f; cylinderSide = true;}
-            else if (vectorRandomization[trialNumber - 10] == 71) {output = -30f; cylinderSide = false;}
-            else if (vectorRandomization[trialNumber - 10] == 72) {output = -30f; cylinderSide = true;}
-        }
-              
-
-        return output;
-
     }
+
+    private void bodyPositionPlayback()
+    {
+        if (playIndice< nbTF)
+        {
+            //playback
+            playIndice++;
+            Bhips2.transform.localPosition = hips[playIndice, 0]; Bhips2.transform.localRotation = Quaternion.Euler(hips[playIndice, 1]);
+            Bspine2.transform.localPosition = spine[playIndice, 0]; Bspine2.transform.localRotation = Quaternion.Euler(spine[playIndice, 1]);
+            Bchest2.transform.localPosition = chest[playIndice, 0]; Bchest2.transform.localRotation = Quaternion.Euler(chest[playIndice, 1]);
+            Bneck2.transform.localPosition = neck[playIndice, 0]; Bneck2.transform.localRotation = Quaternion.Euler(neck[playIndice, 1]);
+            Bhead2.transform.localPosition = head[playIndice, 0]; Bhead2.transform.localRotation = Quaternion.Euler(head[playIndice, 1]);
+            BshoulderL2.transform.localPosition = shoulderL[playIndice, 0]; BshoulderL2.transform.localRotation = Quaternion.Euler(shoulderL[playIndice, 1]);
+            BupperarmL2.transform.localPosition = upperarmL[playIndice, 0]; BupperarmL2.transform.localRotation = Quaternion.Euler(upperarmL[playIndice, 1]);
+            BforerarmL2.transform.localPosition = forerarmL[playIndice, 0]; BforerarmL2.transform.localRotation = Quaternion.Euler(forerarmL[playIndice, 1]);
+            BhandL2.transform.localPosition = handL[playIndice, 0]; BhandL2.transform.localRotation = Quaternion.Euler(handL[playIndice, 1]);
+            BshoulderR2.transform.localPosition = shoulderR[playIndice, 0]; BshoulderR2.transform.localRotation = Quaternion.Euler(shoulderR[playIndice, 1]);
+            BupperarmR2.transform.localPosition = upperarmR[playIndice, 0]; BupperarmR2.transform.localRotation = Quaternion.Euler(upperarmR[playIndice, 1]);
+            BforerarmR2.transform.localPosition = forerarmR[playIndice, 0]; BforerarmR2.transform.localRotation = Quaternion.Euler(forerarmR[playIndice, 1]);
+            BhandR2.transform.localPosition = handR[playIndice, 0]; BhandR2.transform.localRotation = Quaternion.Euler(handR[playIndice, 1]);
+            BthighL2.transform.localPosition = thighL[playIndice, 0]; BthighL2.transform.localRotation = Quaternion.Euler(thighL[playIndice, 1]);
+            BshinL2.transform.localPosition = shinL[playIndice, 0]; BshinL2.transform.localRotation = Quaternion.Euler(shinL[playIndice, 1]);
+            BfootL2.transform.localPosition = footL[playIndice, 0]; BfootL2.transform.localRotation = Quaternion.Euler(footL[playIndice, 1]);
+            BthighR2.transform.localPosition = thighR[playIndice, 0]; BthighR2.transform.localRotation = Quaternion.Euler(thighR[playIndice, 1]);
+            BshinR2.transform.localPosition = shinR[playIndice, 0]; BshinR2.transform.localRotation = Quaternion.Euler(shinR[playIndice, 1]);
+            BfootR2.transform.localPosition = footR[playIndice, 0]; BfootR2.transform.localRotation = Quaternion.Euler(footR[playIndice, 1]);
+        }   
+    }
+
 
     //function to add a line to the csvfile
     private void WriteLine(string[] values, string filePath)
@@ -395,8 +418,7 @@ public class sceneManagerEXP2 : MonoBehaviour
         {
             participantCode,
             temp.ToString(),
-            vectorRandomization[trialNumber - 10].ToString(),
-            accuracy,
+            vectorRandomization[trialNumber - 10].ToString(),           
             response1,
             response2            
         };

@@ -52,7 +52,7 @@ public class questionnaireManager : MonoBehaviour
             }
             else if (LanguageText == "de")
             {
-                questionText.GetComponent<TMPro.TextMeshProUGUI>().text = "Entspricht die auf dem Bildschirm gezeigte Bewegung der Bewegung, die Sie gerade ausgeführt haben?";
+                questionText.GetComponent<TMPro.TextMeshProUGUI>().text = "Entsprach die auf dem Bildschirm gezeigte Bewegung der, die Sie gerade gemacht haben?";
                 text2.GetComponent<TMPro.TextMeshProUGUI>().text = " Ya";
                 text3.GetComponent<TMPro.TextMeshProUGUI>().text = "Nein";
             }

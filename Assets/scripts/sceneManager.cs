@@ -81,9 +81,9 @@ public class sceneManager : MonoBehaviour
         //Preparation of the output files
         DateTime currentDate = DateTime.Now; //get the time
         string dateString = currentDate.ToString("yyyy-MM-dd"); //convert it into string
-        filenamepath1 = outputFolder + dateString + "_" + participantCode +"_FBA_MotionTrack_QuestionnaireData" +".csv";
-        filenamepath2 = outputFolder + dateString + "_" + participantCode + "_FBA_MotionTrack_PosX" + ".csv";
-        filenamepath3 = outputFolder + dateString + "_" + participantCode + "_FBA_MotionTrack_PosZ" + ".csv";
+        filenamepath1 = outputFolder + dateString + "_" + participantCode +"_FBA_Task1_QuestionnaireData" +".csv";
+        filenamepath2 = outputFolder + dateString + "_" + participantCode + "_FBA_Task1_PosX" + ".csv";
+        filenamepath3 = outputFolder + dateString + "_" + participantCode + "_FBA_Task1_PosZ" + ".csv";
 
         //record the header
         string[] Header1 = new string[] { "Pcode", "Trial", "Condition", "Accuracy", "Question1Response", "Question2Response"};
