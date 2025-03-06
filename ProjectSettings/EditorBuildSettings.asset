@@ -4,5 +4,12 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/WalkExperiment.unity
+    guid: a0856dd3a3ab32f4aa7f3cc156b8d34d
+  - enabled: 1
+    path: Assets/Scenes/DelayExperiment.unity
+    guid: 2ac370136c4709e48847d470922dcbfd
   m_configObjects: {}
+  m_UseUCBPForAssetBundles: 0

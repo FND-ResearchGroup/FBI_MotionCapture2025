@@ -17,8 +17,9 @@ public class sceneManager : MonoBehaviour
     public enum gender
     { Female, Male}
     public gender selectGender;
-    public int numberOfTrials;
+    public string SkeletonAssetName;
     public string outputFolder;
+    public int numberOfTrials;
     public GameObject FemaleBody;
     public GameObject MaleBody;
     public GameObject TargetCylinder;
@@ -45,6 +46,7 @@ public class sceneManager : MonoBehaviour
     private string filenamepath1;
     private string filenamepath2;
     private string filenamepath3;
+    private string filenamepath4;
 
     private long timer = 0;
     private Stopwatch stopwatch;
@@ -52,13 +54,23 @@ public class sceneManager : MonoBehaviour
     private bool isRecording = false;
     private string[] matrixX; //elle aura une dimention de 304 élément qui est le maximal autorisé (10s). Le trial au dessus devront être supprimé
     private string[] matrixZ;
+    private string[] matrixTime;
+    private int nbMatrixPoint = 2200;
     private int matrixIndice = 0;
 
 
+    void Awake()
+    {
+        //deploy the Skeleton Asset Name
+        FemaleBody.GetComponent<OptitrackSkeletonAnimator>().SkeletonAssetName = SkeletonAssetName;
+        MaleBody.GetComponent<OptitrackSkeletonAnimator>().SkeletonAssetName = SkeletonAssetName;
+    }
+    
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-       if (selectGender.ToString()=="Female")
+        // Select of the character
+        if (selectGender.ToString()=="Female")
         {
             FemaleBody.SetActive(true);
             MaleBody.SetActive(false);
@@ -84,14 +96,17 @@ public class sceneManager : MonoBehaviour
         filenamepath1 = outputFolder + dateString + "_" + participantCode +"_FBA_Task1_QuestionnaireData" +".csv";
         filenamepath2 = outputFolder + dateString + "_" + participantCode + "_FBA_Task1_PosX" + ".csv";
         filenamepath3 = outputFolder + dateString + "_" + participantCode + "_FBA_Task1_PosZ" + ".csv";
+        filenamepath4 = outputFolder + dateString + "_" + participantCode + "_FBA_Task1_recordingTiming" + ".csv";
 
         //record the header
         string[] Header1 = new string[] { "Pcode", "Trial", "Condition", "Accuracy", "Question1Response", "Question2Response"};
         WriteLine(Header1, filenamepath1); //write the first header line of the output file
-        string[] Header2 = new string[] { "Pcode", "Trial", "PositionX every 33ms"};
+        string[] Header2 = new string[] { "Pcode", "Trial", "PositionX"};
         WriteLine(Header2, filenamepath2);
-        string[] Header3 = new string[] { "Pcode", "Trial", "PositionZ every 33ms" };
+        string[] Header3 = new string[] { "Pcode", "Trial", "PositionZ" };
         WriteLine(Header3, filenamepath3);
+        string[] Header4 = new string[] { "Pcode", "Trial", "Timing in ms" };
+        WriteLine(Header4, filenamepath4);
     }
 
     // Update is called once per frame
@@ -107,8 +122,9 @@ public class sceneManager : MonoBehaviour
             managerState++;
             UnityEngine.Debug.Log("Trial number: " + trialNumber);
 
-            matrixX = new string[304]; //304 is the length max (10s)
-            matrixZ = new string[304];
+            matrixX = new string[nbMatrixPoint]; // is the length max (10s)
+            matrixZ = new string[nbMatrixPoint];
+            matrixTime = new string[nbMatrixPoint];
             matrixIndice = 0;
             stopwatch = new Stopwatch();
             timer = 0;
@@ -127,11 +143,12 @@ public class sceneManager : MonoBehaviour
             {
                 avatar.transform.eulerAngles = new Vector3(0, targetDeviation, 0); //fixé la rotation à la target voulue
                 if (!isRecording)
-                {
-                    stopwatch.Start(); //start of timer for position recording
+                {                    
                     isRecording = true;
                     matrixX[matrixIndice] = positionX.ToString("F3"); //record position of origin
                     matrixZ[matrixIndice] = positionZ.ToString("F3");
+                    matrixTime[matrixIndice] = "0";
+                    stopwatch.Start(); //start of timer for position recording
                 }
             }
             else if (positionZ < 0f)
@@ -141,14 +158,15 @@ public class sceneManager : MonoBehaviour
 
             //record X and Z position
             elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
-            if (isRecording & (elapsedMilliseconds - timer) >= 33) //save a data point every 33ms (30Hz)
+            if (isRecording & (elapsedMilliseconds - timer) >= 5) //save a data point every 5ms (200Hz)
             {
                 matrixIndice++;
                 timer = elapsedMilliseconds;
-                if (matrixIndice < 304)
+                if (matrixIndice < nbMatrixPoint-1)
                 {
                     matrixX[matrixIndice] = positionX.ToString("F3");
                     matrixZ[matrixIndice] = positionZ.ToString("F3");
+                    matrixTime[matrixIndice] = elapsedMilliseconds.ToString();
                 }
 
             }
@@ -189,6 +207,7 @@ public class sceneManager : MonoBehaviour
                 SaveDataQuestionnaire();
                 SaveDataPosition(matrixX, filenamepath2); // save the position X
                 SaveDataPosition(matrixZ, filenamepath3); // save the position Z
+                SaveDataPosition(matrixTime, filenamepath4); // save the timing
             }
 
             //check if end of the experiment

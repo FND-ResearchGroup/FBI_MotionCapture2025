@@ -1163,7 +1163,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: c7116b6c825c8b845b17d603ecbe3177, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1262250383720426611, guid: c7116b6c825c8b845b17d603ecbe3177, type: 3}
       propertyPath: m_Name
@@ -1754,7 +1754,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0, g: 0.7443633, b: 1, a: 0.7058824}
+  m_Color: {r: 0, g: 0.7443633, b: 1, a: 0.39215687}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -7677,11 +7677,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27b7be33cce65e649867f4d955321c9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  participantCode: P000
+  participantCode: P001
   selectLangue: 0
   selectGender: 0
+  SkeletonAssetName: FNDtest
+  outputFolder: D:\FNDlab\FBI_MotionCapture2025\data\
   numberOfTrials: 144
-  outputFolder: D:\FNDlab\FBI_MotionCapture2025\data
   AvatarF: {fileID: 1724394608}
   AvatarM: {fileID: 93572090}
   FemaleBody: {fileID: 206086379}
@@ -14885,6 +14886,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: B-middleFinger03.L2
       objectReference: {fileID: 0}
+    - target: {fileID: -7682262372473016273, guid: b4a78df37623594419bf022884020eeb, type: 3}
+      propertyPath: m_Quality
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -7605848483760087239, guid: b4a78df37623594419bf022884020eeb, type: 3}
       propertyPath: m_Name
       value: B-ringFinger02.L2
@@ -14965,6 +14970,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: B-spine2
       objectReference: {fileID: 0}
+    - target: {fileID: -2406594585747477354, guid: b4a78df37623594419bf022884020eeb, type: 3}
+      propertyPath: m_Quality
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: -2348271410382044142, guid: b4a78df37623594419bf022884020eeb, type: 3}
       propertyPath: m_Name
       value: B-middleFinger03.R2
@@ -14992,6 +15001,10 @@ PrefabInstance:
     - target: {fileID: -725073485681518611, guid: b4a78df37623594419bf022884020eeb, type: 3}
       propertyPath: m_Name
       value: B-shin.L2
+      objectReference: {fileID: 0}
+    - target: {fileID: -602576672606055372, guid: b4a78df37623594419bf022884020eeb, type: 3}
+      propertyPath: m_Quality
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: -407086618600504727, guid: b4a78df37623594419bf022884020eeb, type: 3}
       propertyPath: m_Name
@@ -15048,6 +15061,14 @@ PrefabInstance:
     - target: {fileID: 2104548149105451012, guid: b4a78df37623594419bf022884020eeb, type: 3}
       propertyPath: m_Name
       value: B-forearm.R2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2521110008545675001, guid: b4a78df37623594419bf022884020eeb, type: 3}
+      propertyPath: m_Quality
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2898554135787612098, guid: b4a78df37623594419bf022884020eeb, type: 3}
+      propertyPath: m_Quality
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2910311387390387455, guid: b4a78df37623594419bf022884020eeb, type: 3}
       propertyPath: m_Name
@@ -15108,6 +15129,14 @@ PrefabInstance:
     - target: {fileID: 7662135557176398119, guid: b4a78df37623594419bf022884020eeb, type: 3}
       propertyPath: m_Name
       value: B-toe.R2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7918896221107663315, guid: b4a78df37623594419bf022884020eeb, type: 3}
+      propertyPath: m_Quality
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7925054568078369557, guid: b4a78df37623594419bf022884020eeb, type: 3}
+      propertyPath: m_Quality
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 8525929862086430483, guid: b4a78df37623594419bf022884020eeb, type: 3}
       propertyPath: m_Name
@@ -19375,7 +19404,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 81550466048802013, guid: d90ad9b7ac7bdb84aabe9653af2b8dc4, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.157
+      value: -0.2
       objectReference: {fileID: 0}
     - target: {fileID: 81550466048802013, guid: d90ad9b7ac7bdb84aabe9653af2b8dc4, type: 3}
       propertyPath: m_LocalRotation.w

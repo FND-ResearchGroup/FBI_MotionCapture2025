@@ -17,8 +17,9 @@ public class sceneManagerEXP2 : MonoBehaviour
     public enum gender
     { Female, Male }
     public gender selectGender;
-    public int numberOfTrials;
+    public string SkeletonAssetName;    
     public string outputFolder;
+    public int numberOfTrials;
     public GameObject AvatarF;
     public GameObject AvatarM;
     public GameObject FemaleBody;
@@ -31,7 +32,7 @@ public class sceneManagerEXP2 : MonoBehaviour
     public string response1;
     public string response2;
 
-    private int nbTF = 1500; //determine le nombre de point temporelle qui seront sauvegarder
+    private int nbTF = 1100; //determine le nombre de point temporelle qui seront sauvegarder
     private Vector3[,] hips;
     private Vector3[,] spine;
     private Vector3[,] chest;
@@ -99,26 +100,35 @@ public class sceneManagerEXP2 : MonoBehaviour
     private GameObject BtoeR2;
     private GameObject Avatar;
 
-
-
     private int[] vectorRandomization = new int[144];
     private int trialNumber = -1; // first matrix indice is 0
     private int recordIndice = -1; //indice save position
     private int playIndice = -1; //indice play position
+    private bool participantHasPress = false; //record if the participant press on the mouse to start the trial
 
     private string filenamepath1;
     private string filenamepath2;
     private string filenamepath3;
+    private string filenamepath4;
+    private string filenamepath5;
 
     private long timer = 0;
     private Stopwatch stopwatch;
     private long elapsedMilliseconds;
     private long currentDelay;
-    private string[] toeLZ;
-    private string[] toeRZ;
-    private int matrixIndice = 0;
+    private string[] matrixtoeLZ;
+    private string[] matrixtoeRZ;
+    private string[] matrixhipsZ;
+    private string[] matrixTime;
+    private int nbMatrixPoint = 650; //600 est le minimum et je rajoute 80 de rab
+    private int matrixIndice = -1;
 
-    private float lastFixedUpdateTime = 0f;
+    void Awake()
+    {
+        //deploy the Skeleton Asset Name
+        FemaleBody.GetComponent<OptitrackSkeletonAnimator>().SkeletonAssetName = SkeletonAssetName;
+        MaleBody.GetComponent<OptitrackSkeletonAnimator>().SkeletonAssetName = SkeletonAssetName;
+    }
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -195,28 +205,34 @@ public class sceneManagerEXP2 : MonoBehaviour
         DateTime currentDate = DateTime.Now; //get the time
         string dateString = currentDate.ToString("yyyy-MM-dd"); //convert it into string
         filenamepath1 = outputFolder + dateString + "_" + participantCode + "_FBA_Task2_QuestionnaireData" + ".csv";
-        filenamepath2 = outputFolder + dateString + "_" + participantCode + "_FBA_Task2_PosX" + ".csv";
-        filenamepath3 = outputFolder + dateString + "_" + participantCode + "_FBA_Task2_PosZ" + ".csv";
+        filenamepath2 = outputFolder + dateString + "_" + participantCode + "_FBA_Task2_toeL_Z" + ".csv";
+        filenamepath3 = outputFolder + dateString + "_" + participantCode + "_FBA_Task2_toeR_Z" + ".csv";
+        filenamepath4 = outputFolder + dateString + "_" + participantCode + "_FBA_Task2_hips_Z" + ".csv";
+        filenamepath5 = outputFolder + dateString + "_" + participantCode + "_FBA_Task2_recordingTiming" + ".csv";
 
         ////record the header
-        //string[] Header1 = new string[] { "Pcode", "Trial", "Condition", "Accuracy", "Question1Response", "Question2Response" };
-        //WriteLine(Header1, filenamepath1); //write the first header line of the output file
-        //string[] Header2 = new string[] { "Pcode", "Trial", "PositionX every 33ms" };
-        //WriteLine(Header2, filenamepath2);
-        //string[] Header3 = new string[] { "Pcode", "Trial", "PositionZ every 33ms" };
-        //WriteLine(Header3, filenamepath3);
+        string[] Header1 = new string[] { "Pcode", "Trial", "Delay", "Question1Response", "Question2Response" };
+        WriteLine(Header1, filenamepath1); //write the first header line of the output file
+        string[] Header2 = new string[] { "Pcode", "Trial", "toeL_PositionZ" };
+        WriteLine(Header2, filenamepath2);
+        string[] Header3 = new string[] { "Pcode", "Trial", "toeR_PositionZ" };
+        WriteLine(Header3, filenamepath3);
+        string[] Header4 = new string[] { "Pcode", "Trial", "hips_PositionZ" };
+        WriteLine(Header4, filenamepath4);
+        string[] Header5 = new string[] { "Pcode", "Trial", "Timing in ms" };
+        WriteLine(Header5, filenamepath5);
 
         Time.fixedDeltaTime = 0.005f; //fix update toutes les 5ms
     }
 
     // Update is called once per frame
-    void FixedUpdate()
+    void FixedUpdate()  // void FixedUpdate()
     {
         if (managerState == 0) //Initialisation du trial
         {
             trialNumber++;
             currentDelay = (long)vectorRandomization[trialNumber];
-            UnityEngine.Debug.Log("Trial number: " + trialNumber + "Delay: " + currentDelay);
+            UnityEngine.Debug.Log("Trial number: " + trialNumber + " ; Delay: " + currentDelay);
 
             Avatar.SetActive(false);
             CanavasCross.SetActive(false);
@@ -249,17 +265,27 @@ public class sceneManagerEXP2 : MonoBehaviour
             recordIndice = -1;
             playIndice = -1;
 
+            //Initialisation of the recording vectors
+            matrixIndice = -1;            
+            matrixtoeLZ = new string[nbMatrixPoint];
+            matrixtoeRZ = new string[nbMatrixPoint];
+            matrixhipsZ = new string[nbMatrixPoint];
+            matrixTime = new string[nbMatrixPoint];
+
+            stopwatch = new Stopwatch();
             timer = 0;
-            matrixIndice = 0;
+
+            participantHasPress = false; //reset the listening of mouse press
+
             managerState++;
         }
         else if (managerState == 1) //en attente du participant start
         {
-            if (Input.GetMouseButtonDown(0) | Input.GetMouseButtonDown(1)) //clique droite ou gauche de la souris
+            if (participantHasPress) //clique droite ou gauche de la souris
             {
-                managerState++;
                 CanavasCross.SetActive(true); //trun on the cross
-                stopwatch = new Stopwatch();
+                stopwatch.Start();
+                managerState++;
             }
         }
         else if (managerState == 2) //pre-stim of 2s
@@ -281,14 +307,22 @@ public class sceneManagerEXP2 : MonoBehaviour
         else if (managerState == 3) //start the playback of the mouvement
         {
             elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+
             if (elapsedMilliseconds- timer <= 3000) //durée de 3s du playback
             {
                 bodyPositionRecording(); //continue a sauvé de mouvement
                 bodyPositionPlayback(); // playback du recording 
 
-                //save legs position
-                //NEED TO BE PROGRAMED
-                //toeLZ[matrixIndice] =BtoeL.transform.position.z.ToString("F3"); 
+                //save data
+                matrixIndice++;
+                if (matrixIndice < nbMatrixPoint - 1)
+                {
+                    matrixtoeLZ[matrixIndice] = BtoeL.transform.position.z.ToString("F3");
+                    matrixtoeRZ[matrixIndice] = BtoeR.transform.position.z.ToString("F3");
+                    matrixhipsZ[matrixIndice] = Bhips.transform.position.z.ToString("F3");
+                    matrixTime[matrixIndice] = (elapsedMilliseconds - timer).ToString();
+                }
+                
             }
             else
             {
@@ -296,15 +330,7 @@ public class sceneManagerEXP2 : MonoBehaviour
                 CameraQuestionnaire.SetActive(true);                
                 stopwatch.Stop();
                 managerState++;
-            }
-
-            // timing test NEED TO BE REMOVED
-            float currentTime = Time.realtimeSinceStartup; // Temps écoulé depuis le lancement du jeu
-            float deltaTimeMs = (currentTime - lastFixedUpdateTime) * 1000f; // Convertir en ms
-
-            UnityEngine.Debug.Log("Temps écoulé depuis le dernier FixedUpdate : " + deltaTimeMs + " ms");
-
-            lastFixedUpdateTime = currentTime;
+            }          
 
         }
         else if (managerState == 4) //questionnaire state
@@ -315,8 +341,10 @@ public class sceneManagerEXP2 : MonoBehaviour
         {
             //data saving
             SaveDataQuestionnaire();
-            //SaveDataPosition(matrixX, filenamepath2); // save the position X
-            //SaveDataPosition(matrixZ, filenamepath3); // save the position Z
+            SaveDataPosition(matrixtoeLZ, filenamepath2); // save the toeL
+            SaveDataPosition(matrixtoeRZ, filenamepath3); // save the toeR
+            SaveDataPosition(matrixhipsZ, filenamepath4); // save the hips
+            SaveDataPosition(matrixTime, filenamepath5); // save the position Z
 
 
             //check if end of the experiment
@@ -334,6 +362,14 @@ public class sceneManagerEXP2 : MonoBehaviour
         { }
     }
 
+    void Update()
+    {
+        if (Input.GetMouseButtonDown(0) | Input.GetMouseButtonDown(1))
+        {
+            participantHasPress = true;
+        }
+
+    }
 
     private int[] ShuffleArray(int[] array)
     {
@@ -355,10 +391,10 @@ public class sceneManagerEXP2 : MonoBehaviour
 
     private void bodyPositionRecording()
     {
-        if (recordIndice<nbTF)
+        if (recordIndice < nbTF-1)
         {
              //save current position
-             recordIndice++;
+             recordIndice++; 
              hips[recordIndice, 0] = Bhips.transform.localPosition; hips[recordIndice, 1] = Bhips.transform.localRotation.eulerAngles;
              spine[recordIndice, 0] = Bspine.transform.localPosition; spine[recordIndice, 1] = Bspine.transform.localRotation.eulerAngles;
              chest[recordIndice, 0] = Bchest.transform.localPosition; chest[recordIndice, 1] = Bchest.transform.localRotation.eulerAngles;
@@ -385,7 +421,7 @@ public class sceneManagerEXP2 : MonoBehaviour
 
     private void bodyPositionPlayback()
     {
-        if (playIndice< nbTF)
+        if (playIndice < nbTF-1)
         {
             //playback
             playIndice++;
@@ -429,13 +465,13 @@ public class sceneManagerEXP2 : MonoBehaviour
 
     private void SaveDataQuestionnaire()
     {
-        int temp = trialNumber - 9;
+        int temp = trialNumber + 1;
 
         string[] data = new string[]
         {
             participantCode,
             temp.ToString(),
-            vectorRandomization[trialNumber - 10].ToString(),           
+            vectorRandomization[trialNumber].ToString(),           
             response1,
             response2            
         };
@@ -445,7 +481,7 @@ public class sceneManagerEXP2 : MonoBehaviour
 
     private void SaveDataPosition(string[] positions, string filePath)
     {
-        int temp = trialNumber - 9;
+        int temp = trialNumber + 1;
 
         string[] data = new string[] { participantCode, temp.ToString()}.Concat(positions).ToArray(); //pour concatenate le vecteur de position
         

@@ -1340,11 +1340,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edaf7416ff55ecb449e5f31304869610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  participantCode: P000
+  participantCode: P001
   selectLangue: 0
   selectGender: 0
-  numberOfTrials: 84
+  SkeletonAssetName: FNDtest
   outputFolder: D:\FNDlab\FBI_MotionCapture2025\data\
+  numberOfTrials: 84
   FemaleBody: {fileID: 206086379}
   MaleBody: {fileID: 978556089}
   TargetCylinder: {fileID: 2019797391}
