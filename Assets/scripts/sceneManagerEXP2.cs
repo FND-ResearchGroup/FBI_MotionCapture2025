@@ -31,7 +31,7 @@ public class sceneManagerEXP2 : MonoBehaviour
     public string response1;
     public string response2;
 
-    private int nbTF = 1000; //determine le nombre de point temporelle qui seront sauvegarder
+    private int nbTF = 1500; //determine le nombre de point temporelle qui seront sauvegarder
     private Vector3[,] hips;
     private Vector3[,] spine;
     private Vector3[,] chest;
@@ -48,9 +48,11 @@ public class sceneManagerEXP2 : MonoBehaviour
     private Vector3[,] thighL;
     private Vector3[,] shinL;
     private Vector3[,] footL;
+    private Vector3[,] toeL;
     private Vector3[,] thighR;
     private Vector3[,] shinR;
     private Vector3[,] footR;
+    private Vector3[,] toeR;
 
     private GameObject Bhips;
     private GameObject Bspine;
@@ -68,9 +70,11 @@ public class sceneManagerEXP2 : MonoBehaviour
     private GameObject BthighL;
     private GameObject BshinL;
     private GameObject BfootL;
+    private GameObject BtoeL;
     private GameObject BthighR;
     private GameObject BshinR;
     private GameObject BfootR;
+    private GameObject BtoeR;
 
     private GameObject Bhips2;
     private GameObject Bspine2;
@@ -88,9 +92,11 @@ public class sceneManagerEXP2 : MonoBehaviour
     private GameObject BthighL2;
     private GameObject BshinL2;
     private GameObject BfootL2;
+    private GameObject BtoeL2;
     private GameObject BthighR2;
     private GameObject BshinR2;
     private GameObject BfootR2;
+    private GameObject BtoeR2;
     private GameObject Avatar;
 
 
@@ -108,8 +114,8 @@ public class sceneManagerEXP2 : MonoBehaviour
     private Stopwatch stopwatch;
     private long elapsedMilliseconds;
     private long currentDelay;
-    private string[] matrixX;
-    private string[] matrixZ;
+    private string[] toeLZ;
+    private string[] toeRZ;
     private int matrixIndice = 0;
 
     private float lastFixedUpdateTime = 0f;
@@ -151,9 +157,11 @@ public class sceneManagerEXP2 : MonoBehaviour
         BthighL = GameObject.Find("B-thigh.L");
         BshinL = GameObject.Find("B-shin.L");
         BfootL = GameObject.Find("B-foot.L");
+        BtoeL = GameObject.Find("B-toe.L");
         BthighR = GameObject.Find("B-thigh.R");
         BshinR = GameObject.Find("B-shin.R");
         BfootR = GameObject.Find("B-foot.R");
+        BtoeR = GameObject.Find("B-toe.R");
 
         Bhips2 = GameObject.Find("B-hips2");
         Bspine2 = GameObject.Find("B-spine2");
@@ -171,9 +179,11 @@ public class sceneManagerEXP2 : MonoBehaviour
         BthighL2 = GameObject.Find("B-thigh.L2");
         BshinL2 = GameObject.Find("B-shin.L2");
         BfootL2 = GameObject.Find("B-foot.L2");
+        BtoeL2 = GameObject.Find("B-toe.L2");
         BthighR2 = GameObject.Find("B-thigh.R2");
         BshinR2 = GameObject.Find("B-shin.R2");
         BfootR2 = GameObject.Find("B-foot.R2");
+        BtoeR2 = GameObject.Find("B-toe.R2");
 
 
         //generate the experimental sucession
@@ -230,9 +240,11 @@ public class sceneManagerEXP2 : MonoBehaviour
             thighL = new Vector3[nbTF, 2];
             shinL = new Vector3[nbTF, 2];
             footL = new Vector3[nbTF, 2];
+            toeL = new Vector3[nbTF, 2];
             thighR = new Vector3[nbTF, 2];
             shinR = new Vector3[nbTF, 2];
             footR = new Vector3[nbTF, 2];
+            toeR = new Vector3[nbTF, 2];
 
             recordIndice = -1;
             playIndice = -1;
@@ -276,6 +288,7 @@ public class sceneManagerEXP2 : MonoBehaviour
 
                 //save legs position
                 //NEED TO BE PROGRAMED
+                //toeLZ[matrixIndice] =BtoeL.transform.position.z.ToString("F3"); 
             }
             else
             {
@@ -302,8 +315,8 @@ public class sceneManagerEXP2 : MonoBehaviour
         {
             //data saving
             SaveDataQuestionnaire();
-            SaveDataPosition(matrixX, filenamepath2); // save the position X
-            SaveDataPosition(matrixZ, filenamepath3); // save the position Z
+            //SaveDataPosition(matrixX, filenamepath2); // save the position X
+            //SaveDataPosition(matrixZ, filenamepath3); // save the position Z
 
 
             //check if end of the experiment
@@ -362,9 +375,11 @@ public class sceneManagerEXP2 : MonoBehaviour
              thighL[recordIndice, 0] = BthighL.transform.localPosition; thighL[recordIndice, 1] = BthighL.transform.localRotation.eulerAngles;
              shinL[recordIndice, 0] = BshinL.transform.localPosition; shinL[recordIndice, 1] = BshinL.transform.localRotation.eulerAngles;
              footL[recordIndice, 0] = BfootL.transform.localPosition; footL[recordIndice, 1] = BfootL.transform.localRotation.eulerAngles;
+             toeL[recordIndice, 0] = BtoeL.transform.localPosition; toeL[recordIndice, 1] = BtoeL.transform.localRotation.eulerAngles;
              thighR[recordIndice, 0] = BthighR.transform.localPosition; thighR[recordIndice, 1] = BthighR.transform.localRotation.eulerAngles;
              shinR[recordIndice, 0] = BshinR.transform.localPosition; shinR[recordIndice, 1] = BshinR.transform.localRotation.eulerAngles;
              footR[recordIndice, 0] = BfootR.transform.localPosition; footR[recordIndice, 1] = BfootR.transform.localRotation.eulerAngles;
+             toeR[recordIndice, 0] = BtoeR.transform.localPosition; toeR[recordIndice, 1] = BtoeR.transform.localRotation.eulerAngles;
         }
     }
 
@@ -390,9 +405,11 @@ public class sceneManagerEXP2 : MonoBehaviour
             BthighL2.transform.localPosition = thighL[playIndice, 0]; BthighL2.transform.localRotation = Quaternion.Euler(thighL[playIndice, 1]);
             BshinL2.transform.localPosition = shinL[playIndice, 0]; BshinL2.transform.localRotation = Quaternion.Euler(shinL[playIndice, 1]);
             BfootL2.transform.localPosition = footL[playIndice, 0]; BfootL2.transform.localRotation = Quaternion.Euler(footL[playIndice, 1]);
+            BtoeL2.transform.localPosition = toeL[playIndice, 0]; BtoeL2.transform.localRotation = Quaternion.Euler(toeL[playIndice, 1]);
             BthighR2.transform.localPosition = thighR[playIndice, 0]; BthighR2.transform.localRotation = Quaternion.Euler(thighR[playIndice, 1]);
             BshinR2.transform.localPosition = shinR[playIndice, 0]; BshinR2.transform.localRotation = Quaternion.Euler(shinR[playIndice, 1]);
             BfootR2.transform.localPosition = footR[playIndice, 0]; BfootR2.transform.localRotation = Quaternion.Euler(footR[playIndice, 1]);
+            BtoeR2.transform.localPosition = toeR[playIndice, 0]; BtoeR2.transform.localRotation = Quaternion.Euler(toeR[playIndice, 1]);
         }   
     }
 
