@@ -123,6 +123,8 @@ public class sceneManagerEXP2 : MonoBehaviour
     private int nbMatrixPoint = 650; //600 est le minimum et je rajoute 80 de rab
     private int matrixIndice = -1;
 
+    private bool isPaused = false;
+
     void Awake()
     {
         //deploy the Skeleton Asset Name
@@ -279,14 +281,21 @@ public class sceneManagerEXP2 : MonoBehaviour
 
             managerState++;
         }
-        else if (managerState == 1) //en attente du participant start
+        else if (managerState == 1) //pause if requested
         {
-            if (participantHasPress) //clique droite ou gauche de la souris
+            if (isPaused)
             {
-                CanavasCross.SetActive(true); //trun on the cross
-                stopwatch.Start();
-                managerState++;
+                if (participantHasPress) //clique droite ou gauche de la souris
+                { 
+                    isPaused = false;  //stop thepause
+                }
             }
+            
+            
+            CanavasCross.SetActive(true); //trun on the cross
+            stopwatch.Start();
+            managerState++;
+            
         }
         else if (managerState == 2) //pre-stim of 2s
         {
@@ -367,6 +376,11 @@ public class sceneManagerEXP2 : MonoBehaviour
         if (Input.GetMouseButtonDown(0) | Input.GetMouseButtonDown(1))
         {
             participantHasPress = true;
+        }
+
+        if (Input.GetKeyDown(KeyCode.P))
+        {
+            isPaused = true;
         }
 
     }
