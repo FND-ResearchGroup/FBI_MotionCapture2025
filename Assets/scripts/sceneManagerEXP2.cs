@@ -26,6 +26,7 @@ public class sceneManagerEXP2 : MonoBehaviour
     public GameObject MaleBody;
     public GameObject CameraTask;
     public GameObject CameraQuestionnaire;
+    public GameObject Questionnaire;
     public GameObject CanavasCross;
 
     public int managerState = 0; //0 = initiate Trial; 1 = wait for participant start; 2 = Red cross of 2s (and start of body recording depend on the delay); 3 = Playback of body for 3s; 4 = questionnaire state; 5 = Save data; 7 = end of study
@@ -98,7 +99,6 @@ public class sceneManagerEXP2 : MonoBehaviour
     private GameObject BshinR2;
     private GameObject BfootR2;
     private GameObject BtoeR2;
-    private GameObject Avatar;
 
     private int[] vectorRandomization = new int[144];
     private int trialNumber = -1; // first matrix indice is 0
@@ -141,7 +141,6 @@ public class sceneManagerEXP2 : MonoBehaviour
             MaleBody.SetActive(false);
             AvatarF.SetActive(true);
             AvatarM.SetActive(false);
-            Avatar = AvatarF;
         }
         else
         {
@@ -149,7 +148,6 @@ public class sceneManagerEXP2 : MonoBehaviour
             MaleBody.SetActive(true);
             AvatarF.SetActive(false);
             AvatarM.SetActive(true);
-            Avatar = AvatarM;
         }
 
         //assign the GameObjects
@@ -235,11 +233,11 @@ public class sceneManagerEXP2 : MonoBehaviour
             trialNumber++;
             currentDelay = (long)vectorRandomization[trialNumber];
             UnityEngine.Debug.Log("Trial number: " + trialNumber + " ; Delay: " + currentDelay);
-
-            Avatar.SetActive(false);
+            
             CanavasCross.SetActive(false);
-            CameraTask.SetActive(true);
-            CameraQuestionnaire.SetActive(false);            
+            Questionnaire.SetActive(false);
+            CameraTask.SetActive(false);
+            CameraQuestionnaire.SetActive(true);            
 
             //empty the body recording
             hips = new Vector3[nbTF, 2]; //dans la colonne 1 ce sera les translation et en colonne 2 les rotations
@@ -283,7 +281,7 @@ public class sceneManagerEXP2 : MonoBehaviour
         }
         else if (managerState == 1) //pause if requested
         {
-            if (isPaused)
+            while (isPaused)
             {
                 if (participantHasPress) //clique droite ou gauche de la souris
                 { 
@@ -308,7 +306,8 @@ public class sceneManagerEXP2 : MonoBehaviour
             
             if (elapsedMilliseconds >= 2000)
             {
-                Avatar.SetActive(true); //show the avatar
+                CameraTask.SetActive(true);
+                CameraQuestionnaire.SetActive(false);
                 timer = elapsedMilliseconds; //record the precise time of playback start
                 managerState++;
             }
@@ -336,7 +335,10 @@ public class sceneManagerEXP2 : MonoBehaviour
             else
             {
                 CameraTask.SetActive(false);
-                CameraQuestionnaire.SetActive(true);                
+                CameraQuestionnaire.SetActive(true);
+                Questionnaire.SetActive(true);
+                CanavasCross.SetActive(false);
+
                 stopwatch.Stop();
                 managerState++;
             }          

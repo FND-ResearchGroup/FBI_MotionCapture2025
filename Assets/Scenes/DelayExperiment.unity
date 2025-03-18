@@ -6122,7 +6122,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!81 &665088280
 AudioListener:
   m_ObjectHideFlags: 0
@@ -7704,6 +7704,7 @@ MonoBehaviour:
   MaleBody: {fileID: 978556089}
   CameraTask: {fileID: 963194225}
   CameraQuestionnaire: {fileID: 665088279}
+  Questionnaire: {fileID: 1374538331}
   CanavasCross: {fileID: 597198519853956721}
   managerState: 0
   response1: 
@@ -8825,7 +8826,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!81 &963194226
 AudioListener:
   m_ObjectHideFlags: 0
@@ -11797,7 +11798,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1374538332
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19454,7 +19455,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 81550466048802013, guid: d90ad9b7ac7bdb84aabe9653af2b8dc4, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 20
       objectReference: {fileID: 0}
     - target: {fileID: 81550466048802013, guid: d90ad9b7ac7bdb84aabe9653af2b8dc4, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -19472,9 +19473,17 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 204980045188171025, guid: d90ad9b7ac7bdb84aabe9653af2b8dc4, type: 3}
+      propertyPath: m_PresetInfoIsWorld
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3653880756054928233, guid: d90ad9b7ac7bdb84aabe9653af2b8dc4, type: 3}
       propertyPath: m_Name
       value: CanvasCross
+      objectReference: {fileID: 0}
+    - target: {fileID: 3653880756054928233, guid: d90ad9b7ac7bdb84aabe9653af2b8dc4, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
