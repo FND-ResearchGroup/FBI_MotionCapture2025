@@ -101,6 +101,7 @@ public class sceneManagerEXP2 : MonoBehaviour
     private GameObject BtoeR2;
 
     private int[] vectorRandomization = new int[144];
+    private int[] practiceTrials = { 0, 0, 75, 100, 150};
     private int trialNumber = -1; // first matrix indice is 0
     private int recordIndice = -1; //indice save position
     private int playIndice = -1; //indice play position
@@ -231,7 +232,16 @@ public class sceneManagerEXP2 : MonoBehaviour
         if (managerState == 0) //Initialisation du trial
         {
             trialNumber++;
-            currentDelay = (long)vectorRandomization[trialNumber];
+            
+            if (trialNumber<5)
+            {
+                currentDelay = (long)practiceTrials[trialNumber];
+            }
+            else
+            {
+                currentDelay = (long)vectorRandomization[trialNumber-5];
+            }
+            
             UnityEngine.Debug.Log("Trial number: " + trialNumber + " ; Delay: " + currentDelay);
             
             CanavasCross.SetActive(false);
@@ -351,15 +361,19 @@ public class sceneManagerEXP2 : MonoBehaviour
         else if (managerState == 5) //save data
         {
             //data saving
-            SaveDataQuestionnaire();
-            SaveDataPosition(matrixtoeLZ, filenamepath2); // save the toeL
-            SaveDataPosition(matrixtoeRZ, filenamepath3); // save the toeR
-            SaveDataPosition(matrixhipsZ, filenamepath4); // save the hips
-            SaveDataPosition(matrixTime, filenamepath5); // save the position Z
+            if (trialNumber>=5)
+            {
+                SaveDataQuestionnaire();
+                SaveDataPosition(matrixtoeLZ, filenamepath2); // save the toeL
+                SaveDataPosition(matrixtoeRZ, filenamepath3); // save the toeR
+                SaveDataPosition(matrixhipsZ, filenamepath4); // save the hips
+                SaveDataPosition(matrixTime, filenamepath5); // save the position Z
+            }
+            
 
 
             //check if end of the experiment
-            if (trialNumber >= numberOfTrials-1)
+            if (trialNumber-5 >= numberOfTrials-1)
             {
                 managerState = 7; //terminate the study
             }
@@ -481,13 +495,13 @@ public class sceneManagerEXP2 : MonoBehaviour
 
     private void SaveDataQuestionnaire()
     {
-        int temp = trialNumber + 1;
+        int temp = trialNumber - 5 + 1;
 
         string[] data = new string[]
         {
             participantCode,
             temp.ToString(),
-            vectorRandomization[trialNumber].ToString(),           
+            vectorRandomization[trialNumber-5].ToString(),           
             response1,
             response2            
         };
@@ -497,7 +511,7 @@ public class sceneManagerEXP2 : MonoBehaviour
 
     private void SaveDataPosition(string[] positions, string filePath)
     {
-        int temp = trialNumber + 1;
+        int temp = trialNumber - 5 + 1;
 
         string[] data = new string[] { participantCode, temp.ToString()}.Concat(positions).ToArray(); //pour concatenate le vecteur de position
         
