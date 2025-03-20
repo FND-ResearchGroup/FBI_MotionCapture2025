@@ -220,7 +220,7 @@ public class questionnaireManagerEXP2 : MonoBehaviour
             }
 
         }
-        else if (questionaireState == 5)//end of questionnaire, repositionner
+        else if (questionaireState == 5)//end of questionnaire
         {
             elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
 
@@ -235,7 +235,7 @@ public class questionnaireManagerEXP2 : MonoBehaviour
                 sceneManager.managerState = 5;                
             }
         }
-        else if (sceneManager.managerState == 7) //Fin de l'étude
+        else if (sceneManager.managerState == 7 | sceneManager.managerState == 8) //Fin de l'étude
         {
             PanelBox1.SetActive(false);
             PanelBox2.SetActive(false);

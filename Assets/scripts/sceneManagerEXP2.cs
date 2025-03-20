@@ -124,7 +124,7 @@ public class sceneManagerEXP2 : MonoBehaviour
     private int nbMatrixPoint = 650; //600 est le minimum et je rajoute 80 de rab
     private int matrixIndice = -1;
 
-    private bool isPaused = false;
+    private bool isPaused = true;
 
     void Awake()
     {
@@ -135,7 +135,7 @@ public class sceneManagerEXP2 : MonoBehaviour
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
-    {
+    {        
         if (selectGender.ToString() == "Female")
         {
             FemaleBody.SetActive(true);
@@ -224,6 +224,8 @@ public class sceneManagerEXP2 : MonoBehaviour
         WriteLine(Header5, filenamepath5);
 
         Time.fixedDeltaTime = 0.005f; //fix update toutes les 5ms
+
+        Cursor.visible = false; //masquer le pointeur de la souris
     }
 
     // Update is called once per frame
@@ -242,8 +244,9 @@ public class sceneManagerEXP2 : MonoBehaviour
                 currentDelay = (long)vectorRandomization[trialNumber-5];
             }
             
-            UnityEngine.Debug.Log("Trial number: " + trialNumber + " ; Delay: " + currentDelay);
-            
+            //UnityEngine.Debug.Log("Trial number: " + trialNumber + " ; Delay: " + currentDelay);
+            UnityEngine.Debug.Log("Trial number: " + trialNumber);
+
             CanavasCross.SetActive(false);
             Questionnaire.SetActive(false);
             CameraTask.SetActive(false);
@@ -289,20 +292,20 @@ public class sceneManagerEXP2 : MonoBehaviour
 
             managerState++;
         }
-        else if (managerState == 1) //pause if requested
+        else if (managerState == 1) 
         {
-            while (isPaused)
+            if (isPaused) //pause if requested
             {
-                if (participantHasPress) //clique droite ou gauche de la souris
-                { 
-                    isPaused = false;  //stop thepause
-                }
+                managerState = 10;
+                UnityEngine.Debug.Log("Experiment in pause");
             }
-            
-            
-            CanavasCross.SetActive(true); //trun on the cross
-            stopwatch.Start();
-            managerState++;
+            else
+            {
+                CanavasCross.SetActive(true); //trun on the cross
+                stopwatch.Start();
+                managerState++;
+            }
+       
             
         }
         else if (managerState == 2) //pre-stim of 2s
@@ -384,7 +387,17 @@ public class sceneManagerEXP2 : MonoBehaviour
                         
         }
         else if (managerState == 7) //end of the study
-        { }
+        {
+            Cursor.visible = true;
+        }
+        else if (managerState == 10) //pause state
+        {
+            if (participantHasPress)
+            {
+                isPaused = false;
+                managerState = 1;
+            }
+        }
     }
 
     void Update()

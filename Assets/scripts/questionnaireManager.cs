@@ -19,7 +19,6 @@ public class questionnaireManager : MonoBehaviour
     private int questionaireState=0;
 
     private int scrollValue = 0;  // Variable qui sera modifiée par la molette
-    private float scrollInput;
 
     private Stopwatch stopwatch;
     private long elapsedMilliseconds;
@@ -41,8 +40,9 @@ public class questionnaireManager : MonoBehaviour
             PanelBox4.SetActive(false);
             PanelBox2.SetActive(true);
             PanelBox3.SetActive(true);
-            PanelBox2.GetComponent<Image>().color = Color.white;
+            PanelBox2.GetComponent<Image>().color = new Color(0.28f, 0.76f, 0.3f);
             PanelBox3.GetComponent<Image>().color = Color.white;
+            scrollValue = 0;
 
             if (LanguageText == "fr")
             {
@@ -67,19 +67,36 @@ public class questionnaireManager : MonoBehaviour
         }
         else if (questionaireState == 1) //attente réponse pour la première question
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) & scrollValue > 0) //décrémente
             {
-                PanelBox2.GetComponent<Image>().color = new Color(0.84f, 0.07f, 0.17f);
-                sceneManager.response1 = "1";
-                stopwatch.Start();
-                questionaireState++;               
+                scrollValue = 0;
+                PanelBox2.GetComponent<Image>().color = new Color(0.28f, 0.76f, 0.3f);
+                PanelBox3.GetComponent<Image>().color = Color.white;
+
             }
-            else if (Input.GetMouseButtonDown(1)) 
+            else if (Input.GetMouseButtonDown(1) & scrollValue < 1) //incémente
             {
-                PanelBox3.GetComponent<Image>().color = new Color(0.84f, 0.07f, 0.17f);
-                sceneManager.response1 = "0";
-                stopwatch.Start();
-                questionaireState++;                
+                scrollValue = 1;
+                PanelBox2.GetComponent<Image>().color = Color.white;
+                PanelBox3.GetComponent<Image>().color = new Color(0.28f, 0.76f, 0.3f);
+            }
+
+            if (Input.GetMouseButtonDown(2)) //réponse sélectionner détecter
+            {
+                if (scrollValue == 0)
+                {
+                    PanelBox2.GetComponent<Image>().color = new Color(0.84f, 0.07f, 0.17f);
+                    sceneManager.response1 = "1";
+                    stopwatch.Start();
+                    questionaireState++;
+                }
+                else
+                {
+                    PanelBox3.GetComponent<Image>().color = new Color(0.84f, 0.07f, 0.17f);
+                    sceneManager.response1 = "0";
+                    stopwatch.Start();
+                    questionaireState++;
+                }
             }
 
         }
@@ -119,15 +136,13 @@ public class questionnaireManager : MonoBehaviour
         }
         else if (questionaireState == 4)//attente réponse pour la deuxième question
         {
-            scrollInput = Input.GetAxis("Mouse ScrollWheel");
-
-            if (scrollInput > 0) // Molette vers le haut
+            if (Input.GetMouseButtonDown(1) & scrollValue < 3)
             {
-                if (scrollValue < 3) { scrollValue = scrollValue + 1; } // Incrémente
+                scrollValue = scrollValue + 1; // Incrémente
             }
-            else if (scrollInput < 0) // Molette vers le bas
+            else if (Input.GetMouseButtonDown(0) & scrollValue > 0)
             {
-                if (scrollValue > 0) { scrollValue = scrollValue - 1; } // Décrémente
+                scrollValue = scrollValue - 1; // Décrémente
             }
 
             if (scrollValue == 0)
@@ -230,7 +245,7 @@ public class questionnaireManager : MonoBehaviour
                 sceneManager.managerState = 4;                
             }
         }
-        else if (sceneManager.managerState == 8) //Fin de l'étude
+        else if (sceneManager.managerState == 7 | sceneManager.managerState == 8) //Fin de l'étude
         {
             PanelBox1.SetActive(false);
             PanelBox2.SetActive(false);

@@ -7692,10 +7692,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 27b7be33cce65e649867f4d955321c9d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  participantCode: P001
+  participantCode: P999
   selectLangue: 0
   selectGender: 0
-  SkeletonAssetName: FNDtest
+  SkeletonAssetName: Skeleton
   outputFolder: D:\FNDlab\FBI_MotionCapture2025\data\
   numberOfTrials: 144
   AvatarF: {fileID: 1724394608}

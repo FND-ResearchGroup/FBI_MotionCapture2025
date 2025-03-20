@@ -1340,7 +1340,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: edaf7416ff55ecb449e5f31304869610, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  participantCode: P001
+  participantCode: P999
   selectLangue: 0
   selectGender: 0
   SkeletonAssetName: FNDtest

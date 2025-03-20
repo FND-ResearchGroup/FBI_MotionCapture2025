@@ -107,6 +107,8 @@ public class sceneManager : MonoBehaviour
         WriteLine(Header3, filenamepath3);
         string[] Header4 = new string[] { "Pcode", "Trial", "Timing in ms" };
         WriteLine(Header4, filenamepath4);
+
+        Cursor.visible = false; //masquer le pointeur de la souris
     }
 
     // Update is called once per frame
@@ -176,13 +178,13 @@ public class sceneManager : MonoBehaviour
             {
                 accuracy = "1";
                 managerState++;
-                UnityEngine.Debug.Log("Accuracy: " + accuracy);
+                //UnityEngine.Debug.Log("Accuracy: " + accuracy);
             }
             else if (collisionManager.collisionEnd)
             {
                 accuracy = "0";
                 managerState++;
-                UnityEngine.Debug.Log("Accuracy: " + accuracy);
+                //UnityEngine.Debug.Log("Accuracy: " + accuracy);
             }
 
         }
@@ -227,8 +229,10 @@ public class sceneManager : MonoBehaviour
             }
 
         }
-        else if (managerState == 8)
-        { }//end of the study
+        else if (managerState == 8) //end of the study
+        {
+            Cursor.visible = true; //masquer le pointeur de la souris
+        }
     }
 
 
